@@ -116,9 +116,17 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 page-enter">
-      <div>
-        <h1 className="text-2xl font-bold">仪表盘</h1>
-        <p className="text-muted-foreground text-sm mt-1">短视频数据概览与快速操作</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">仪表盘</h1>
+          <p className="text-muted-foreground text-sm mt-1">短视频数据概览与快速操作</p>
+        </div>
+        {allRecords.length > 0 && (
+          <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={exporting} className="gap-2">
+            <Download className={`h-4 w-4 ${exporting ? 'animate-spin' : ''}`} />
+            {exporting ? '导出中...' : '导出报告'}
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
