@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import EmptyState from '@/components/EmptyState';
 import CompetitorCompare from '@/components/CompetitorCompare';
+import AIInsightsCard from '@/components/AIInsightsCard';
 import { useRecords } from '@/hooks/useCloudData';
 
 const ALL_PLATFORMS: ('all' | Platform)[] = ['all', 'douyin', 'kuaishou', 'xiaohongshu', 'bilibili'];
@@ -262,6 +263,8 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       )}
+
+      {allRecords.length > 0 && <AIInsightsCard records={allRecords} />}
 
       <CompetitorCompare />
 
