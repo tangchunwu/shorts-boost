@@ -4,16 +4,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Platform, PLATFORM_LABELS, PublishRecord } from '@/lib/types';
 import { getRecords, saveRecord, deleteRecord } from '@/lib/storage';
-import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+
+interface ReviewResult {
+  summary: string;
+  topPatterns: string[];
+  weakPoints: string[];
+  actionItems: string[];
+  bestTitle: string;
+}
 
 export default function Records() {
   const [records, setRecords] = useState<PublishRecord[]>(() => getRecords());
   const [open, setOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [reviewing, setReviewing] = useState(false);
+  const [reviewResult, setReviewResult] = useState<ReviewResult | null>(null);
   const [form, setForm] = useState({
     title: '', platform: 'douyin' as Platform, publishedAt: new Date().toISOString().slice(0, 10),
     views: '', likes: '', comments: '', shares: '', tags: '',
@@ -50,6 +63,7 @@ export default function Records() {
 
   const handleDelete = (id: string) => {
     deleteRecord(id);
+    setSelectedIds(prev => { const n = new Set(prev); n.delete(id); return n; });
     setRecords(getRecords());
     toast.success('已删除');
   };
@@ -58,6 +72,58 @@ export default function Records() {
     const next = r.performance === 'high' ? 'low' : r.performance === 'low' ? 'normal' : 'high';
     saveRecord({ ...r, performance: next });
     setRecords(getRecords());
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id); else n.add(id);
+      return n;
+    });
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === records.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(records.map(r => r.id)));
+    }
+  };
+
+  const handleReview = async () => {
+    if (selectedIds.size < 2) {
+      toast.error('请至少选择 2 条记录进行复盘');
+      return;
+    }
+    setReviewing(true);
+    setReviewResult(null);
+
+    const selected = records.filter(r => selectedIds.has(r.id)).map(r => ({
+      title: r.title,
+      platform: PLATFORM_LABELS[r.platform],
+      views: r.views,
+      likes: r.likes,
+      comments: r.comments,
+      shares: r.shares,
+      tags: r.tags,
+      performance: r.performance,
+    }));
+
+    try {
+      const { data, error } = await supabase.functions.invoke('review-records', {
+        body: { records: selected },
+      });
+
+      if (error) throw new Error(error.message);
+      if (data?.error) { toast.error(data.error); setReviewing(false); return; }
+
+      setReviewResult(data as ReviewResult);
+      toast.success('复盘分析完成！');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '复盘失败，请重试');
+    } finally {
+      setReviewing(false);
+    }
   };
 
   return (
@@ -105,6 +171,99 @@ export default function Records() {
         </Dialog>
       </div>
 
+      {/* Selection toolbar */}
+      {records.length > 0 && (
+        <div className="flex items-center gap-3 flex-wrap">
+          <Button variant="outline" size="sm" onClick={selectAll}>
+            {selectedIds.size === records.length ? '取消全选' : '全选'}
+          </Button>
+          <Button
+            size="sm"
+            disabled={selectedIds.size < 2 || reviewing}
+            onClick={handleReview}
+            className="gap-1.5"
+            style={selectedIds.size >= 2 ? { backgroundImage: 'var(--gradient-accent)' } : undefined}
+          >
+            {reviewing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            AI 复盘分析 {selectedIds.size > 0 && `(${selectedIds.size})`}
+          </Button>
+          {selectedIds.size > 0 && selectedIds.size < 2 && (
+            <span className="text-xs text-muted-foreground">至少选择 2 条记录</span>
+          )}
+        </div>
+      )}
+
+      {/* AI Review Result */}
+      {reviewResult && (
+        <div className="space-y-4">
+          <Card className="border-primary/20 bg-primary/5">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                AI 复盘分析报告
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Summary */}
+              <div className="p-3 rounded-lg bg-card">
+                <p className="text-sm font-medium mb-1">📊 总体表现</p>
+                <p className="text-sm text-muted-foreground">{reviewResult.summary}</p>
+              </div>
+
+              {/* Best title */}
+              <div className="p-3 rounded-lg bg-card">
+                <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                  <Trophy className="h-3.5 w-3.5 text-warning" /> 最佳标题
+                </p>
+                <p className="text-sm text-muted-foreground">{reviewResult.bestTitle}</p>
+              </div>
+
+              {/* Top patterns */}
+              <div className="p-3 rounded-lg bg-card">
+                <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                  <Star className="h-3.5 w-3.5 text-success" /> 成功规律
+                </p>
+                <ul className="space-y-1.5">
+                  {reviewResult.topPatterns.map((p, i) => (
+                    <li key={i} className="text-sm text-muted-foreground flex gap-2">
+                      <span className="text-success shrink-0">✓</span>{p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Weak points */}
+              <div className="p-3 rounded-lg bg-card">
+                <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                  <AlertTriangle className="h-3.5 w-3.5 text-warning" /> 需要改进
+                </p>
+                <ul className="space-y-1.5">
+                  {reviewResult.weakPoints.map((p, i) => (
+                    <li key={i} className="text-sm text-muted-foreground flex gap-2">
+                      <span className="text-warning shrink-0">!</span>{p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Action items */}
+              <div className="p-3 rounded-lg bg-card">
+                <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                  <Lightbulb className="h-3.5 w-3.5 text-primary" /> 行动建议
+                </p>
+                <ul className="space-y-1.5">
+                  {reviewResult.actionItems.map((a, i) => (
+                    <li key={i} className="text-sm text-muted-foreground flex gap-2">
+                      <span className="text-primary font-medium shrink-0">{i + 1}.</span>{a}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Chart */}
       {chartData.length > 0 && (
         <Card>
@@ -129,9 +288,14 @@ export default function Records() {
       {/* Records list */}
       <div className="space-y-3">
         {records.map(r => (
-          <Card key={r.id} className={r.performance === 'high' ? 'ring-1 ring-success/30' : r.performance === 'low' ? 'ring-1 ring-destructive/30' : ''}>
+          <Card key={r.id} className={`transition-all ${selectedIds.has(r.id) ? 'ring-2 ring-primary/40' : ''} ${r.performance === 'high' ? 'ring-1 ring-success/30' : r.performance === 'low' ? 'ring-1 ring-destructive/30' : ''}`}>
             <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  checked={selectedIds.has(r.id)}
+                  onCheckedChange={() => toggleSelect(r.id)}
+                  className="mt-1 shrink-0"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-sm font-semibold truncate">{r.title}</h3>
