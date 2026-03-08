@@ -36,19 +36,6 @@ export default function Dashboard() {
   const [aiInsights, setAiInsights] = useState<Insight[]>([]);
   const [exporting, setExporting] = useState(false);
 
-  const handleExportPDF = useCallback(async () => {
-    setExporting(true);
-    try {
-      await exportDashboardPDF({ records, insights: aiInsights, platformFilter, timeRange });
-      toast.success('PDF 报告已下载');
-    } catch (e) {
-      console.error('Export PDF error:', e);
-      toast.error('导出失败，请重试');
-    } finally {
-      setExporting(false);
-    }
-  }, [records, aiInsights, platformFilter, timeRange]);
-
   const records = useMemo(() => {
     let filtered = allRecords;
     if (platformFilter !== 'all') filtered = filtered.filter(r => r.platform === platformFilter);
