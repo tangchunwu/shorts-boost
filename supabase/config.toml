@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.review-records]
 verify_jwt = false
+
+[functions.compare-titles]
+verify_jwt = false
