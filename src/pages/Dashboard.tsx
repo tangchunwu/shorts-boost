@@ -289,7 +289,7 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {allRecords.length > 0 && <AIInsightsCard records={allRecords} />}
+      {allRecords.length > 0 && <AIInsightsCard records={allRecords} onInsightsChange={setAiInsights} />}
 
       <CompetitorCompare />
 
