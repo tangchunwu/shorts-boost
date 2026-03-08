@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PLATFORM_LABELS, PLATFORM_COLORS, type PublishRecord, type Platform } from '@/lib/types';
 import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, BarChart3, Share2, Percent, Download } from 'lucide-react';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import EmptyState from '@/components/EmptyState';
 import CompetitorCompare from '@/components/CompetitorCompare';
@@ -35,6 +35,8 @@ export default function Dashboard() {
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
   const [aiInsights, setAiInsights] = useState<Insight[]>([]);
   const [exporting, setExporting] = useState(false);
+  const pieChartsRef = useRef<HTMLDivElement>(null);
+  const trendChartRef = useRef<HTMLDivElement>(null);
 
   const records = useMemo(() => {
     let filtered = allRecords;
@@ -47,7 +49,16 @@ export default function Dashboard() {
   const handleExportPDF = useCallback(async () => {
     setExporting(true);
     try {
-      await exportDashboardPDF({ records, insights: aiInsights, platformFilter, timeRange });
+      await exportDashboardPDF({
+        records,
+        insights: aiInsights,
+        platformFilter,
+        timeRange,
+        chartElements: {
+          pieCharts: pieChartsRef.current,
+          trendChart: trendChartRef.current,
+        },
+      });
       toast.success('PDF 报告已下载');
     } catch (e) {
       console.error('Export PDF error:', e);
@@ -209,7 +220,7 @@ export default function Dashboard() {
       )}
 
       {pieData.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in-up">
+        <div ref={pieChartsRef} className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in-up">
           <Card className="card-hover">
             <CardHeader className="pb-2"><CardTitle className="text-base">📊 播放量平台分布</CardTitle></CardHeader>
             <CardContent>
@@ -249,7 +260,7 @@ export default function Dashboard() {
         <Card className="animate-fade-in-up">
           <CardHeader className="pb-2"><CardTitle className="text-base">播放量趋势</CardTitle></CardHeader>
           <CardContent>
-            <div className="h-48">
+            <div ref={trendChartRef} className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
                    <defs>
