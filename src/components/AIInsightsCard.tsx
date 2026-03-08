@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { PublishRecord } from '@/lib/types';
 import { toast } from 'sonner';
 
-interface Insight {
+export interface Insight {
   type: 'trend' | 'anomaly' | 'tip' | 'warning';
   title: string;
   description: string;
@@ -19,7 +19,12 @@ const INSIGHT_CONFIG: Record<string, { icon: typeof TrendingUp; color: string; b
   warning: { icon: AlertTriangle, color: 'text-warning', bg: 'bg-warning/10' },
 };
 
-export default function AIInsightsCard({ records }: { records: PublishRecord[] }) {
+interface Props {
+  records: PublishRecord[];
+  onInsightsChange?: (insights: Insight[]) => void;
+}
+
+export default function AIInsightsCard({ records, onInsightsChange }: Props) {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [rawContent, setRawContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,9 +45,11 @@ export default function AIInsightsCard({ records }: { records: PublishRecord[] }
         toast.error(data.error);
         return;
       }
-      setInsights(data.insights || []);
+      const newInsights = data.insights || [];
+      setInsights(newInsights);
       setRawContent(data.rawContent || '');
       setHasLoaded(true);
+      onInsightsChange?.(newInsights);
     } catch (e: any) {
       console.error('AI insights error:', e);
       toast.error('AI 洞察分析失败，请稍后重试');
