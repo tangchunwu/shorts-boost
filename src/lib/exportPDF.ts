@@ -9,6 +9,10 @@ interface ExportData {
   insights: Insight[];
   platformFilter: string;
   timeRange: string;
+  chartElements?: {
+    pieCharts: HTMLElement | null;
+    trendChart: HTMLElement | null;
+  };
 }
 
 const INSIGHT_EMOJI: Record<string, string> = {
@@ -18,8 +22,24 @@ const INSIGHT_EMOJI: Record<string, string> = {
   warning: '⚠️',
 };
 
+async function captureElement(el: HTMLElement | null): Promise<string | null> {
+  if (!el) return null;
+  try {
+    const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    return canvas.toDataURL('image/png');
+  } catch {
+    return null;
+  }
+}
+
 export async function exportDashboardPDF(data: ExportData) {
-  const { records, insights, platformFilter, timeRange } = data;
+  const { records, insights, platformFilter, timeRange, chartElements } = data;
+
+  // Capture charts in parallel before building the report
+  const [pieChartsImg, trendChartImg] = await Promise.all([
+    captureElement(chartElements?.pieCharts ?? null),
+    captureElement(chartElements?.trendChart ?? null),
+  ]);
 
   const totalViews = records.reduce((s, r) => s + r.views, 0);
   const totalLikes = records.reduce((s, r) => s + r.likes, 0);
@@ -86,8 +106,22 @@ export async function exportDashboardPDF(data: ExportData) {
       `).join('')}
     </div>
 
-    ${Object.keys(platformBreakdown).length > 0 ? `
+    ${pieChartsImg ? `
       <h2 style="font-size:16px;font-weight:600;color:#5a6a8a;margin-bottom:12px;">📊 平台分布</h2>
+      <div style="margin-bottom:32px;text-align:center;">
+        <img src="${pieChartsImg}" style="max-width:100%;border-radius:12px;" />
+      </div>
+    ` : ''}
+
+    ${trendChartImg ? `
+      <h2 style="font-size:16px;font-weight:600;color:#5a6a8a;margin-bottom:12px;">📈 播放量趋势</h2>
+      <div style="margin-bottom:32px;text-align:center;">
+        <img src="${trendChartImg}" style="max-width:100%;border-radius:12px;" />
+      </div>
+    ` : ''}
+
+    ${Object.keys(platformBreakdown).length > 0 ? `
+      <h2 style="font-size:16px;font-weight:600;color:#5a6a8a;margin-bottom:12px;">📋 平台数据明细</h2>
       <table style="width:100%;border-collapse:collapse;margin-bottom:32px;font-size:13px;">
         <thead>
           <tr style="background:#f5f3f0;">
