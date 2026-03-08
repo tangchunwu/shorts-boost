@@ -204,6 +204,7 @@ export default function Records() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Selection toolbar */}
