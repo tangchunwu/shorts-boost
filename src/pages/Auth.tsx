@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, User } from 'lucide-react';
+import { Loader2, Mail, Lock, User, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Auth() {
@@ -46,7 +46,9 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md animate-fade-in">
         <CardHeader className="text-center">
-          <div className="text-3xl mb-2">📈</div>
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2 mx-auto">
+            <TrendingUp className="h-6 w-6 text-primary" />
+          </div>
           <CardTitle className="text-xl bg-clip-text text-transparent" style={{ backgroundImage: 'var(--gradient-primary)' }}>
             短视频增长助手
           </CardTitle>
