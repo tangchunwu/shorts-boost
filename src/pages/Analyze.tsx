@@ -7,23 +7,74 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Platform, PLATFORM_LABELS, SEOSuggestion, AnalysisHistory } from '@/lib/types';
-import { useAnalyses, useSaveAnalysis } from '@/hooks/useCloudData';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { Platform, PLATFORM_LABELS, SEOSuggestion, AnalysisHistory, CalendarEvent } from '@/lib/types';
+import { useAnalyses, useSaveAnalysis, useSaveCalendarEvent } from '@/hooks/useCloudData';
 import { supabase } from '@/integrations/supabase/client';
-import { Copy, Check, Loader2, Sparkles, Clock, Hash, Lightbulb, History, Eye, ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { Copy, Check, Loader2, Sparkles, Clock, Hash, Lightbulb, History, Eye, ChevronDown, ChevronUp, Search, CalendarPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import EmptyState from '@/components/EmptyState';
 
-function ResultDisplay({ result, copied, copyText, stagger = false }: { result: SEOSuggestion; copied: string | null; copyText: (text: string, label: string) => void; stagger?: boolean }) {
+function AddToCalendarButton({ title, platform }: { title: string; platform: Platform }) {
+  const [date, setDate] = useState<Date>();
+  const [open, setOpen] = useState(false);
+  const saveEvent = useSaveCalendarEvent();
+
+  const handleSelect = (d: Date | undefined) => {
+    if (!d) return;
+    setDate(d);
+    const event: CalendarEvent = {
+      id: crypto.randomUUID(),
+      title,
+      platform,
+      date: format(d, 'yyyy-MM-dd'),
+      status: 'planned',
+    };
+    saveEvent.mutate(event, {
+      onSuccess: () => {
+        toast.success('已添加到内容日历 📅');
+        setOpen(false);
+        setDate(undefined);
+      },
+    });
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" title="加入日历">
+          <CalendarPlus className="h-3.5 w-3.5 text-primary" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="end">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={handleSelect}
+          initialFocus
+          className={cn("p-3 pointer-events-auto")}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function ResultDisplay({ result, platform, copied, copyText, stagger = false }: { result: SEOSuggestion; platform: Platform; copied: string | null; copyText: (text: string, label: string) => void; stagger?: boolean }) {
   const cards = [
     { icon: <Sparkles className="h-4 w-4 text-primary" />, title: '推荐标题', content: (
       <div className="space-y-2">
         {result.titles.map((t, i) => (
           <div key={i} className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-secondary/50 group hover:bg-secondary/80 transition-colors">
             <span className="text-sm flex-1">{t}</span>
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => copyText(t, `title-${i}`)}>
-              {copied === `title-${i}` ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            </Button>
+            <div className="flex gap-0.5">
+              <AddToCalendarButton title={t} platform={platform} />
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => copyText(t, `title-${i}`)}>
+                {copied === `title-${i}` ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              </Button>
+            </div>
           </div>
         ))}
       </div>
@@ -157,7 +208,7 @@ export default function Analyze() {
               </Button>
             </CardContent>
           </Card>
-          {result && <ResultDisplay result={result} copied={copied} copyText={copyText} stagger />}
+          {result && <ResultDisplay result={result} platform={platform} copied={copied} copyText={copyText} stagger />}
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4 mt-4">
@@ -208,7 +259,7 @@ export default function Analyze() {
                               {h.suggestions.keywords.length > 5 && <Badge variant="secondary" className="text-xs">+{h.suggestions.keywords.length - 5}</Badge>}
                             </div>
                           )}
-                          {isExpanded && h.suggestions && <div className="mt-4 animate-fade-in"><ResultDisplay result={h.suggestions} copied={copied} copyText={copyText} /></div>}
+                          {isExpanded && h.suggestions && <div className="mt-4 animate-fade-in"><ResultDisplay result={h.suggestions} platform={h.platform} copied={copied} copyText={copyText} /></div>}
                         </div>
                         <div className="flex gap-1 shrink-0">
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : h.id)}>

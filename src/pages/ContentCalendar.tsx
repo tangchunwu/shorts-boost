@@ -5,12 +5,81 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Platform, PLATFORM_LABELS, PLATFORM_COLORS, CalendarEvent } from '@/lib/types';
-import { useCalendarEvents, useSaveCalendarEvent, useDeleteCalendarEvent } from '@/hooks/useCloudData';
-import { Plus, ChevronLeft, ChevronRight, Trash2, Check, Calendar } from 'lucide-react';
+import { Platform, PLATFORM_LABELS, PLATFORM_COLORS, CalendarEvent, PublishRecord } from '@/lib/types';
+import { useCalendarEvents, useSaveCalendarEvent, useDeleteCalendarEvent, useSaveRecord } from '@/hooks/useCloudData';
+import { Plus, ChevronLeft, ChevronRight, Trash2, Check, Calendar, ArrowRightCircle, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths } from 'date-fns';
 import EmptyState from '@/components/EmptyState';
+
+function ConvertToRecordDialog({ event, onDone }: { event: CalendarEvent; onDone: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [views, setViews] = useState('0');
+  const [likes, setLikes] = useState('0');
+  const [comments, setComments] = useState('0');
+  const [shares, setShares] = useState('0');
+  const saveRecord = useSaveRecord();
+  const saveEvent = useSaveCalendarEvent();
+
+  const handleConvert = () => {
+    const record: PublishRecord = {
+      id: crypto.randomUUID(),
+      title: event.title,
+      platform: event.platform,
+      publishedAt: event.date,
+      views: parseInt(views) || 0,
+      likes: parseInt(likes) || 0,
+      comments: parseInt(comments) || 0,
+      shares: parseInt(shares) || 0,
+      tags: [],
+      performance: 'normal',
+      createdAt: new Date().toISOString(),
+    };
+    saveRecord.mutate(record, {
+      onSuccess: () => {
+        saveEvent.mutate({ ...event, status: 'published', recordId: record.id }, {
+          onSuccess: () => {
+            toast.success('已转为发布记录 📊');
+            setOpen(false);
+            onDone();
+          },
+        });
+      },
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="转为发布记录">
+          <ArrowRightCircle className="h-3.5 w-3.5 text-primary" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>转为发布记录</DialogTitle></DialogHeader>
+        <div className="space-y-4 pt-2">
+          <div className="space-y-1">
+            <Label className="text-muted-foreground text-xs">标题</Label>
+            <p className="text-sm font-medium">{event.title}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div><Label className="text-muted-foreground text-xs">平台</Label><p>{PLATFORM_LABELS[event.platform]}</p></div>
+            <div><Label className="text-muted-foreground text-xs">日期</Label><p>{event.date}</p></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1"><Label htmlFor="r-views">播放量</Label><Input id="r-views" type="number" min="0" value={views} onChange={e => setViews(e.target.value)} /></div>
+            <div className="space-y-1"><Label htmlFor="r-likes">点赞数</Label><Input id="r-likes" type="number" min="0" value={likes} onChange={e => setLikes(e.target.value)} /></div>
+            <div className="space-y-1"><Label htmlFor="r-comments">评论数</Label><Input id="r-comments" type="number" min="0" value={comments} onChange={e => setComments(e.target.value)} /></div>
+            <div className="space-y-1"><Label htmlFor="r-shares">分享数</Label><Input id="r-shares" type="number" min="0" value={shares} onChange={e => setShares(e.target.value)} /></div>
+          </div>
+          <Button onClick={handleConvert} className="w-full" disabled={saveRecord.isPending || saveEvent.isPending}>
+            <ArrowRightCircle className="h-4 w-4 mr-1" /> 保存为发布记录
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function ContentCalendar() {
   const { data: events = [], isLoading } = useCalendarEvents();
@@ -120,10 +189,12 @@ export default function ContentCalendar() {
                     {today ? <span className="inline-block w-5 h-5 rounded-full bg-primary text-primary-foreground text-center leading-5 text-[11px]">{format(day, 'd')}</span> : format(day, 'd')}
                   </div>
                   {dayEvents.slice(0, 2).map(ev => (
-                    <div key={ev.id} className="text-[10px] leading-tight truncate px-1.5 py-0.5 rounded-md mb-0.5 cursor-pointer transition-opacity hover:opacity-80"
+                    <div key={ev.id} className="text-[10px] leading-tight truncate px-1.5 py-0.5 rounded-md mb-0.5 cursor-pointer transition-opacity hover:opacity-80 flex items-center gap-0.5"
                       style={{ backgroundColor: `${PLATFORM_COLORS[ev.platform]}18`, color: PLATFORM_COLORS[ev.platform], borderLeft: `2px solid ${PLATFORM_COLORS[ev.platform]}` }}
                       onClick={e => { e.stopPropagation(); toggleStatus(ev); }}>
-                      {ev.status === 'published' && <Check className="inline h-2.5 w-2.5 mr-0.5" />}{ev.title.slice(0, 6)}
+                      {ev.status === 'published' && <Check className="inline h-2.5 w-2.5 shrink-0" />}
+                      {ev.recordId && <Link2 className="inline h-2.5 w-2.5 shrink-0" />}
+                      <span className="truncate">{ev.title.slice(0, 6)}</span>
                     </div>
                   ))}
                   {dayEvents.length > 2 && <div className="text-[10px] text-muted-foreground px-1">+{dayEvents.length - 2}</div>}
@@ -148,6 +219,7 @@ export default function ContentCalendar() {
                   </div>
                 </div>
                 <div className="flex gap-1 shrink-0">
+                  <ConvertToRecordDialog event={e} onDone={() => {}} />
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => toggleStatus(e)}><Check className="h-3.5 w-3.5" /></Button>
                   <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(e.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
