@@ -64,10 +64,20 @@ export default function AppLayout() {
           ))}
         </nav>
         <Separator className="my-3" />
-        <Button variant="ghost" size="sm" onClick={() => setDark(!dark)} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
-          {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          {dark ? '浅色模式' : '深色模式'}
-        </Button>
+        <div className="space-y-1">
+          <Button variant="ghost" size="sm" onClick={() => { downloadBackup(); toast.success('备份已下载'); }} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
+            <Download className="h-4 w-4" /> 备份数据
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => restoreInputRef.current?.click()} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
+            <Upload className="h-4 w-4" /> 恢复数据
+          </Button>
+          <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
+          <Separator className="my-2" />
+          <Button variant="ghost" size="sm" onClick={() => setDark(!dark)} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {dark ? '浅色模式' : '深色模式'}
+          </Button>
+        </div>
       </aside>
 
       {/* Mobile nav */}
