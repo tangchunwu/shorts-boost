@@ -44,6 +44,19 @@ export default function Dashboard() {
     return filtered;
   }, [allRecords, platformFilter, timeRange]);
 
+  const handleExportPDF = useCallback(async () => {
+    setExporting(true);
+    try {
+      await exportDashboardPDF({ records, insights: aiInsights, platformFilter, timeRange });
+      toast.success('PDF 报告已下载');
+    } catch (e) {
+      console.error('Export PDF error:', e);
+      toast.error('导出失败，请重试');
+    } finally {
+      setExporting(false);
+    }
+  }, [records, aiInsights, platformFilter, timeRange]);
+
   const totalViews = records.reduce((s, r) => s + r.views, 0);
   const totalLikes = records.reduce((s, r) => s + r.likes, 0);
   const totalComments = records.reduce((s, r) => s + r.comments, 0);
