@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Platform, PLATFORM_LABELS, SEOSuggestion, AnalysisHistory } from '@/lib/types';
 import { saveAnalysis } from '@/lib/storage';
+import { supabase } from '@/integrations/supabase/client';
 import { Search, Copy, Check, Loader2, Sparkles, Clock, Hash, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -27,44 +28,41 @@ export default function Analyze() {
     setResult(null);
 
     try {
-      // Mock AI response for now - will be replaced with edge function call
-      await new Promise(r => setTimeout(r, 1500));
-      const mockResult: SEOSuggestion = {
-        titles: [
-          `${title || '短视频'} | 3个技巧让播放量翻倍`,
-          `99%的人不知道的${PLATFORM_LABELS[platform]}流量密码`,
-          `${title || '视频'}: 从0到10万播放的秘密`,
-          `${PLATFORM_LABELS[platform]}爆款标题公式，学会就涨粉`,
-          `看完这个，你的${title || '短视频'}播放量至少翻3倍`,
-        ],
-        keywords: ['短视频运营', '播放量', '爆款', '涨粉', '流量密码', PLATFORM_LABELS[platform], '标题优化', '关键词'],
-        tips: [
-          '标题前3个字要有强吸引力，用数字或疑问句开头',
-          '在脚本前3秒设置悬念 hook，降低跳出率',
-          `${PLATFORM_LABELS[platform]}建议标题长度控制在15-25字`,
-          '使用当下热门话题标签，增加推荐概率',
-          '发布后30分钟内积极回复评论，提升互动率',
-        ],
-        bestPostTime: platform === 'douyin' ? '周一至周五 12:00-13:00, 18:00-20:00' :
-          platform === 'xiaohongshu' ? '周末 10:00-12:00, 20:00-22:00' :
-          platform === 'bilibili' ? '周五至周日 18:00-21:00' :
-          '每天 11:00-13:00, 19:00-21:00',
+      const { data, error } = await supabase.functions.invoke('analyze-seo', {
+        body: { title, script, platform: PLATFORM_LABELS[platform] },
+      });
+
+      if (error) {
+        throw new Error(error.message || '分析失败');
+      }
+
+      if (data?.error) {
+        toast.error(data.error);
+        setLoading(false);
+        return;
+      }
+
+      const seoResult: SEOSuggestion = {
+        titles: data.titles || [],
+        keywords: data.keywords || [],
+        tips: data.tips || [],
+        bestPostTime: data.bestPostTime || '',
       };
 
-      setResult(mockResult);
+      setResult(seoResult);
 
       const history: AnalysisHistory = {
         id: crypto.randomUUID(),
         inputTitle: title,
         inputScript: script,
         platform,
-        suggestions: mockResult,
+        suggestions: seoResult,
         createdAt: new Date().toISOString().slice(0, 10),
       };
       saveAnalysis(history);
       toast.success('分析完成！');
     } catch (e) {
-      toast.error('分析失败，请重试');
+      toast.error(e instanceof Error ? e.message : '分析失败，请重试');
     } finally {
       setLoading(false);
     }
