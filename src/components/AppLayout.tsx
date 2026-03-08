@@ -1,8 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { BarChart3, Search, FileText, Calendar, Sun, Moon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { downloadBackup, restoreFromBackup } from '@/lib/storage';
+import { toast } from 'sonner';
 
 const navItems = [
   { to: '/', icon: BarChart3, label: '仪表盘' },
