@@ -65,6 +65,27 @@ export default function Dashboard() {
     return counts;
   }, [allRecords]);
 
+  // Pie chart data: views/likes by platform
+  const pieData = useMemo(() => {
+    const map: Record<string, { views: number; likes: number }> = {};
+    for (const r of allRecords) {
+      if (!map[r.platform]) map[r.platform] = { views: 0, likes: 0 };
+      map[r.platform].views += r.views;
+      map[r.platform].likes += r.likes;
+    }
+    return Object.entries(map)
+      .map(([platform, data]) => ({
+        name: PLATFORM_LABELS[platform as Platform],
+        platform: platform as Platform,
+        views: data.views,
+        likes: data.likes,
+      }))
+      .filter(d => d.views > 0)
+      .sort((a, b) => b.views - a.views);
+  }, [allRecords]);
+
+  const PIE_COLORS = pieData.map(d => PLATFORM_COLORS[d.platform]);
+
   return (
     <div className="space-y-6 page-enter">
       <div>
