@@ -129,15 +129,15 @@ export default function Records() {
       {/* Records list */}
       <div className="space-y-3">
         {records.map(r => (
-          <Card key={r.id} className={r.performance === 'high' ? 'ring-1 ring-green-500/30' : r.performance === 'low' ? 'ring-1 ring-red-500/30' : ''}>
+          <Card key={r.id} className={r.performance === 'high' ? 'ring-1 ring-success/30' : r.performance === 'low' ? 'ring-1 ring-destructive/30' : ''}>
             <CardContent className="p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-sm font-semibold truncate">{r.title}</h3>
                     <Badge variant="outline" className="shrink-0 text-xs">{PLATFORM_LABELS[r.platform]}</Badge>
-                    {r.performance === 'high' && <Badge className="bg-green-500/10 text-green-600 text-xs"><TrendingUp className="h-3 w-3 mr-0.5" />高表现</Badge>}
-                    {r.performance === 'low' && <Badge className="bg-red-500/10 text-red-600 text-xs"><TrendingDown className="h-3 w-3 mr-0.5" />低表现</Badge>}
+                    {r.performance === 'high' && <Badge className="bg-success/10 text-success text-xs"><TrendingUp className="h-3 w-3 mr-0.5" />高表现</Badge>}
+                    {r.performance === 'low' && <Badge className="bg-destructive/10 text-destructive text-xs"><TrendingDown className="h-3 w-3 mr-0.5" />低表现</Badge>}
                   </div>
                   <p className="text-xs text-muted-foreground mb-2">{r.publishedAt}</p>
                   <div className="flex gap-4 text-xs text-muted-foreground">
