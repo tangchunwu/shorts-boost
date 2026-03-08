@@ -2,13 +2,15 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PLATFORM_LABELS, PLATFORM_COLORS, type PublishRecord, type Platform } from '@/lib/types';
-import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, BarChart3, Share2, Percent } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, BarChart3, Share2, Percent, Download } from 'lucide-react';
+import { useMemo, useState, useCallback } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import EmptyState from '@/components/EmptyState';
 import CompetitorCompare from '@/components/CompetitorCompare';
-import AIInsightsCard from '@/components/AIInsightsCard';
+import AIInsightsCard, { type Insight } from '@/components/AIInsightsCard';
 import { useRecords } from '@/hooks/useCloudData';
+import { exportDashboardPDF } from '@/lib/exportPDF';
+import { toast } from 'sonner';
 
 const ALL_PLATFORMS: ('all' | Platform)[] = ['all', 'douyin', 'kuaishou', 'xiaohongshu', 'bilibili'];
 
@@ -31,6 +33,21 @@ export default function Dashboard() {
   const { data: allRecords = [], isLoading } = useRecords();
   const [platformFilter, setPlatformFilter] = useState<'all' | Platform>('all');
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
+  const [aiInsights, setAiInsights] = useState<Insight[]>([]);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportPDF = useCallback(async () => {
+    setExporting(true);
+    try {
+      await exportDashboardPDF({ records, insights: aiInsights, platformFilter, timeRange });
+      toast.success('PDF 报告已下载');
+    } catch (e) {
+      console.error('Export PDF error:', e);
+      toast.error('导出失败，请重试');
+    } finally {
+      setExporting(false);
+    }
+  }, [records, aiInsights, platformFilter, timeRange]);
 
   const records = useMemo(() => {
     let filtered = allRecords;
