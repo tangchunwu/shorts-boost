@@ -1,1 +1,4 @@
 project_id = "eiuougvloanbrhvvkadl"
+
+[functions.analyze-seo]
+verify_jwt = false
