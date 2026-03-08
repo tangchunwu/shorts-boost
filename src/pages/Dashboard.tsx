@@ -133,34 +133,56 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* Platform filter */}
+      {/* Filters */}
       {allRecords.length > 0 && (
-        <div className="flex flex-wrap gap-2 animate-fade-in">
-          {ALL_PLATFORMS.map(p => {
-            const isActive = platformFilter === p;
-            const count = platformCounts[p] || 0;
-            if (p !== 'all' && count === 0) return null;
-            return (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 animate-fade-in">
+          {/* Time range */}
+          <div className="flex gap-1.5 bg-secondary/50 rounded-lg p-1">
+            {TIME_RANGES.map(({ value, label }) => (
               <button
-                key={p}
-                onClick={() => setPlatformFilter(p)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
-                  isActive
-                    ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                    : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                key={value}
+                onClick={() => setTimeRange(value)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+                  timeRange === value
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {p !== 'all' && (
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: isActive ? 'hsl(0, 0%, 100%)' : PLATFORM_COLORS[p as Platform] }}
-                  />
-                )}
-                {p === 'all' ? '全部' : PLATFORM_LABELS[p as Platform]}
-                <span className={`text-[10px] ${isActive ? 'opacity-80' : 'opacity-60'}`}>({count})</span>
+                {label}
               </button>
-            );
-          })}
+            ))}
+          </div>
+
+          <div className="h-5 w-px bg-border hidden sm:block" />
+
+          {/* Platform filter */}
+          <div className="flex flex-wrap gap-2">
+            {ALL_PLATFORMS.map(p => {
+              const isActive = platformFilter === p;
+              const count = platformCounts[p] || 0;
+              if (p !== 'all' && count === 0) return null;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPlatformFilter(p)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
+                    isActive
+                      ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                      : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                  }`}
+                >
+                  {p !== 'all' && (
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: isActive ? 'hsl(0, 0%, 100%)' : PLATFORM_COLORS[p as Platform] }}
+                    />
+                  )}
+                  {p === 'all' ? '全部' : PLATFORM_LABELS[p as Platform]}
+                  <span className={`text-[10px] ${isActive ? 'opacity-80' : 'opacity-60'}`}>({count})</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
