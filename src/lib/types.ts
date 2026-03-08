@@ -8,10 +8,10 @@ export const PLATFORM_LABELS: Record<Platform, string> = {
 };
 
 export const PLATFORM_COLORS: Record<Platform, string> = {
-  douyin: 'hsl(340, 82%, 56%)',
-  kuaishou: 'hsl(25, 95%, 53%)',
-  xiaohongshu: 'hsl(0, 80%, 55%)',
-  bilibili: 'hsl(197, 100%, 47%)',
+  douyin: 'hsl(350, 22%, 62%)',
+  kuaishou: 'hsl(25, 28%, 58%)',
+  xiaohongshu: 'hsl(0, 22%, 58%)',
+  bilibili: 'hsl(200, 25%, 55%)',
 };
 
 export interface PublishRecord {
