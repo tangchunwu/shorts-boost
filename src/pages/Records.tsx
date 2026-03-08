@@ -293,7 +293,7 @@ export default function Records() {
                             <Tooltip />
                             <Bar dataKey="views" name="播放量" radius={[4, 4, 0, 0]}>
                               {perRecordData.map((entry, i) => (
-                                <rect key={i} fill={entry.fill} />
+                                <Cell key={i} fill={entry.fill} />
                               ))}
                             </Bar>
                           </BarChart>
