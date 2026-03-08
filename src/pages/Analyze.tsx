@@ -4,42 +4,39 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Platform, PLATFORM_LABELS, SEOSuggestion, AnalysisHistory } from '@/lib/types';
 import { getAnalyses, saveAnalysis } from '@/lib/storage';
 import { supabase } from '@/integrations/supabase/client';
-import { Copy, Check, Loader2, Sparkles, Clock, Hash, Lightbulb, History, Trash2, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Copy, Check, Loader2, Sparkles, Clock, Hash, Lightbulb, History, Eye, ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import EmptyState from '@/components/EmptyState';
 
-function ResultDisplay({ result, copied, copyText }: { result: SEOSuggestion; copied: string | null; copyText: (text: string, label: string) => void }) {
-  return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" /> 推荐标题
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
+function ResultDisplay({ result, copied, copyText, stagger = false }: { result: SEOSuggestion; copied: string | null; copyText: (text: string, label: string) => void; stagger?: boolean }) {
+  const cards = [
+    {
+      icon: <Sparkles className="h-4 w-4 text-primary" />,
+      title: '推荐标题',
+      content: (
+        <div className="space-y-2">
           {result.titles.map((t, i) => (
-            <div key={i} className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-secondary/50 group">
+            <div key={i} className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-secondary/50 group hover:bg-secondary/80 transition-colors">
               <span className="text-sm flex-1">{t}</span>
               <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => copyText(t, `title-${i}`)}>
                 {copied === `title-${i}` ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               </Button>
             </div>
           ))}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Hash className="h-4 w-4 text-primary" /> 推荐关键词/标签
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+        </div>
+      ),
+    },
+    {
+      icon: <Hash className="h-4 w-4 text-primary" />,
+      title: '推荐关键词/标签',
+      content: (
+        <>
           <div className="flex flex-wrap gap-2">
             {result.keywords.map((kw, i) => (
               <Badge key={i} variant="secondary" className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors" onClick={() => copyText(`#${kw}`, `kw-${i}`)}>
@@ -52,36 +49,41 @@ function ResultDisplay({ result, copied, copyText }: { result: SEOSuggestion; co
             {copied === 'all-kw' ? <Check className="h-3.5 w-3.5 mr-1" /> : <Copy className="h-3.5 w-3.5 mr-1" />}
             复制全部标签
           </Button>
-        </CardContent>
-      </Card>
+        </>
+      ),
+    },
+    {
+      icon: <Lightbulb className="h-4 w-4 text-primary" />,
+      title: 'SEO 优化建议',
+      content: (
+        <ul className="space-y-2">
+          {result.tips.map((tip, i) => (
+            <li key={i} className="text-sm flex gap-2">
+              <span className="text-primary font-medium shrink-0">{i + 1}.</span>{tip}
+            </li>
+          ))}
+        </ul>
+      ),
+    },
+    {
+      icon: <Clock className="h-4 w-4 text-primary" />,
+      title: '最佳发布时间',
+      content: <p className="text-sm">{result.bestPostTime}</p>,
+    },
+  ];
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Lightbulb className="h-4 w-4 text-primary" /> SEO 优化建议
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            {result.tips.map((tip, i) => (
-              <li key={i} className="text-sm flex gap-2">
-                <span className="text-primary font-medium shrink-0">{i + 1}.</span>{tip}
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Clock className="h-4 w-4 text-primary" /> 最佳发布时间
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm">{result.bestPostTime}</p>
-        </CardContent>
-      </Card>
+  return (
+    <div className="space-y-4">
+      {cards.map((card, i) => (
+        <Card key={i} className={`card-hover ${stagger ? `animate-fade-in-up animate-stagger-${i + 1}` : ''}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              {card.icon} {card.title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>{card.content}</CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
@@ -173,7 +175,7 @@ export default function Analyze() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-enter">
       <div>
         <h1 className="text-2xl font-bold">SEO 分析</h1>
         <p className="text-muted-foreground text-sm mt-1">AI 智能优化标题、关键词和发布策略</p>
@@ -190,21 +192,26 @@ export default function Analyze() {
         </TabsList>
 
         <TabsContent value="analyze" className="space-y-6 mt-4">
-          {/* Input */}
-          <Card>
+          <Card className="card-hover">
             <CardContent className="p-5 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-3">
-                <Input placeholder="输入视频标题..." value={title} onChange={e => setTitle(e.target.value)} className="text-base" />
-                <Select value={platform} onValueChange={v => setPlatform(v as Platform)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
-                      <SelectItem key={k} value={k}>{v}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="space-y-2">
+                <Label htmlFor="seo-title">视频标题</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-3">
+                  <Input id="seo-title" placeholder="输入视频标题..." value={title} onChange={e => setTitle(e.target.value)} className="text-base" />
+                  <Select value={platform} onValueChange={v => setPlatform(v as Platform)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
+                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <Textarea placeholder="粘贴视频脚本或描述内容（可选）..." value={script} onChange={e => setScript(e.target.value)} rows={4} />
+              <div className="space-y-2">
+                <Label htmlFor="seo-script">脚本内容（可选）</Label>
+                <Textarea id="seo-script" placeholder="粘贴视频脚本或描述内容..." value={script} onChange={e => setScript(e.target.value)} rows={4} />
+              </div>
               <Button onClick={handleAnalyze} disabled={loading} className="w-full sm:w-auto" style={{ backgroundImage: 'var(--gradient-primary)' }}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 {loading ? 'AI 分析中...' : '开始分析'}
@@ -212,13 +219,13 @@ export default function Analyze() {
             </CardContent>
           </Card>
 
-          {result && <ResultDisplay result={result} copied={copied} copyText={copyText} />}
+          {result && <ResultDisplay result={result} copied={copied} copyText={copyText} stagger />}
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4 mt-4">
           {/* Compare mode */}
           {compareIds.size >= 2 && (
-            <Card className="border-primary/20 bg-primary/5">
+            <Card className="border-primary/20 bg-primary/5 animate-scale-in">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Eye className="h-4 w-4 text-primary" /> 对比分析（{compareIds.size} 条）
@@ -292,19 +299,20 @@ export default function Analyze() {
             <p className="text-xs text-muted-foreground">再选择 {2 - compareIds.size} 条记录即可对比</p>
           )}
 
-          {/* History list */}
           {histories.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
-                <p>还没有分析记录，去「新建分析」开始吧 ✨</p>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={Search}
+              title="还没有分析记录"
+              description="去「新建分析」开始你的第一次 SEO 优化吧 ✨"
+              actionLabel="新建分析"
+              onAction={() => setActiveTab('analyze')}
+            />
           ) : (
             <div className="space-y-3">
-              {histories.map(h => {
+              {histories.map((h, i) => {
                 const isExpanded = expandedId === h.id;
                 return (
-                  <Card key={h.id} className={`transition-all ${compareIds.has(h.id) ? 'ring-2 ring-primary/40' : ''}`}>
+                  <Card key={h.id} className={`card-hover animate-fade-in-up animate-stagger-${Math.min(i + 1, 5)} ${compareIds.has(h.id) ? 'ring-2 ring-primary/40' : ''}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
                         <input
@@ -333,9 +341,8 @@ export default function Analyze() {
                             </div>
                           )}
 
-                          {/* Expanded content */}
                           {isExpanded && h.suggestions && (
-                            <div className="mt-4">
+                            <div className="mt-4 animate-fade-in">
                               <ResultDisplay result={h.suggestions} copied={copied} copyText={copyText} />
                             </div>
                           )}

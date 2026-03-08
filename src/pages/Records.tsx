@@ -2,18 +2,20 @@ import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Platform, PLATFORM_LABELS, PublishRecord } from '@/lib/types';
+import { Platform, PLATFORM_LABELS, PLATFORM_COLORS, PublishRecord } from '@/lib/types';
 import { getRecords, saveRecord, deleteRecord } from '@/lib/storage';
 import { exportToCSV, parseCSV } from '@/lib/csv';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star, Download, Upload } from 'lucide-react';
+import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star, Download, Upload, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
 import { useRef } from 'react';
+import EmptyState from '@/components/EmptyState';
 
 interface ReviewResult {
   summary: string;
@@ -152,7 +154,7 @@ export default function Records() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-enter">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">发布记录</h1>
@@ -178,28 +180,52 @@ export default function Records() {
             <DialogHeader>
               <DialogTitle>添加发布记录</DialogTitle>
             </DialogHeader>
-            <div className="space-y-3 pt-2">
-              <Input placeholder="视频标题" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
-              <div className="grid grid-cols-2 gap-3">
-                <Select value={form.platform} onValueChange={v => setForm(f => ({ ...f, platform: v as Platform }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
-                      <SelectItem key={k} value={k}>{v}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input type="date" value={form.publishedAt} onChange={e => setForm(f => ({ ...f, publishedAt: e.target.value }))} />
+            <div className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label htmlFor="rec-title">视频标题</Label>
+                <Input id="rec-title" placeholder="输入视频标题" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Input placeholder="播放量" type="number" value={form.views} onChange={e => setForm(f => ({ ...f, views: e.target.value }))} />
-                <Input placeholder="点赞数" type="number" value={form.likes} onChange={e => setForm(f => ({ ...f, likes: e.target.value }))} />
+                <div className="space-y-2">
+                  <Label>发布平台</Label>
+                  <Select value={form.platform} onValueChange={v => setForm(f => ({ ...f, platform: v as Platform }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
+                        <SelectItem key={k} value={k}>{v}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="rec-date">发布日期</Label>
+                  <Input id="rec-date" type="date" value={form.publishedAt} onChange={e => setForm(f => ({ ...f, publishedAt: e.target.value }))} />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Input placeholder="评论数" type="number" value={form.comments} onChange={e => setForm(f => ({ ...f, comments: e.target.value }))} />
-                <Input placeholder="分享数" type="number" value={form.shares} onChange={e => setForm(f => ({ ...f, shares: e.target.value }))} />
+                <div className="space-y-2">
+                  <Label htmlFor="rec-views">播放量</Label>
+                  <Input id="rec-views" placeholder="0" type="number" value={form.views} onChange={e => setForm(f => ({ ...f, views: e.target.value }))} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="rec-likes">点赞数</Label>
+                  <Input id="rec-likes" placeholder="0" type="number" value={form.likes} onChange={e => setForm(f => ({ ...f, likes: e.target.value }))} />
+                </div>
               </div>
-              <Input placeholder="标签（逗号分隔）" value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="rec-comments">评论数</Label>
+                  <Input id="rec-comments" placeholder="0" type="number" value={form.comments} onChange={e => setForm(f => ({ ...f, comments: e.target.value }))} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="rec-shares">分享数</Label>
+                  <Input id="rec-shares" placeholder="0" type="number" value={form.shares} onChange={e => setForm(f => ({ ...f, shares: e.target.value }))} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="rec-tags">标签（逗号分隔）</Label>
+                <Input id="rec-tags" placeholder="美食, 日常, vlog" value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} />
+              </div>
               <Button onClick={handleSubmit} className="w-full">保存</Button>
             </div>
           </DialogContent>
@@ -231,7 +257,7 @@ export default function Records() {
 
       {/* AI Review Result */}
       {reviewResult && (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-fade-in-up">
           <Card className="border-primary/20 bg-primary/5">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -259,7 +285,6 @@ export default function Records() {
 
                 const hasGroups = high.length > 0 || low.length > 0;
 
-                // Radar data: normalize each metric to 0-100 scale
                 const maxViews = Math.max(...selected.map(r => r.views), 1);
                 const maxLikes = Math.max(...selected.map(r => r.likes), 1);
                 const maxComments = Math.max(...selected.map(r => r.comments), 1);
@@ -272,7 +297,6 @@ export default function Records() {
                   { metric: '分享', high: Math.round(avg(high, 'shares') / maxShares * 100), low: Math.round(avg(low, 'shares') / maxShares * 100) },
                 ];
 
-                // Per-record comparison bar chart
                 const perRecordData = selected.map(r => ({
                   title: r.title.slice(0, 6) + (r.title.length > 6 ? '..' : ''),
                   views: r.views,
@@ -282,7 +306,6 @@ export default function Records() {
 
                 return (
                   <>
-                    {/* Per record views comparison */}
                     <div className="p-3 rounded-lg bg-card">
                       <p className="text-sm font-medium mb-2">📊 选中记录播放量对比</p>
                       <div className="h-44">
@@ -306,7 +329,6 @@ export default function Records() {
                       </div>
                     </div>
 
-                    {/* Grouped average comparison */}
                     {hasGroups && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="p-3 rounded-lg bg-card">
@@ -348,13 +370,11 @@ export default function Records() {
                 );
               })()}
 
-              {/* Summary */}
               <div className="p-3 rounded-lg bg-card">
                 <p className="text-sm font-medium mb-1">📊 总体表现</p>
                 <p className="text-sm text-muted-foreground">{reviewResult.summary}</p>
               </div>
 
-              {/* Best title */}
               <div className="p-3 rounded-lg bg-card">
                 <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
                   <Trophy className="h-3.5 w-3.5 text-warning" /> 最佳标题
@@ -362,7 +382,6 @@ export default function Records() {
                 <p className="text-sm text-muted-foreground">{reviewResult.bestTitle}</p>
               </div>
 
-              {/* Top patterns */}
               <div className="p-3 rounded-lg bg-card">
                 <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
                   <Star className="h-3.5 w-3.5 text-success" /> 成功规律
@@ -376,7 +395,6 @@ export default function Records() {
                 </ul>
               </div>
 
-              {/* Weak points */}
               <div className="p-3 rounded-lg bg-card">
                 <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
                   <AlertTriangle className="h-3.5 w-3.5 text-warning" /> 需要改进
@@ -390,7 +408,6 @@ export default function Records() {
                 </ul>
               </div>
 
-              {/* Action items */}
               <div className="p-3 rounded-lg bg-card">
                 <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
                   <Lightbulb className="h-3.5 w-3.5 text-primary" /> 行动建议
@@ -410,7 +427,7 @@ export default function Records() {
 
       {/* Chart */}
       {chartData.length > 0 && (
-        <Card>
+        <Card className="animate-fade-in-up">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">播放量对比</CardTitle>
           </CardHeader>
@@ -431,8 +448,8 @@ export default function Records() {
 
       {/* Records list */}
       <div className="space-y-3">
-        {records.map(r => (
-          <Card key={r.id} className={`transition-all ${selectedIds.has(r.id) ? 'ring-2 ring-primary/40' : ''} ${r.performance === 'high' ? 'ring-1 ring-success/30' : r.performance === 'low' ? 'ring-1 ring-destructive/30' : ''}`}>
+        {records.map((r, i) => (
+          <Card key={r.id} className={`card-hover animate-fade-in-up animate-stagger-${Math.min(i + 1, 5)} ${selectedIds.has(r.id) ? 'ring-2 ring-primary/40' : ''} ${r.performance === 'high' ? 'ring-1 ring-success/30' : r.performance === 'low' ? 'ring-1 ring-destructive/30' : ''}`}>
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
                 <Checkbox
@@ -443,7 +460,13 @@ export default function Records() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-sm font-semibold truncate">{r.title}</h3>
-                    <Badge variant="outline" className="shrink-0 text-xs">{PLATFORM_LABELS[r.platform]}</Badge>
+                    <Badge
+                      variant="outline"
+                      className="shrink-0 text-xs"
+                      style={{ borderColor: PLATFORM_COLORS[r.platform], color: PLATFORM_COLORS[r.platform] }}
+                    >
+                      {PLATFORM_LABELS[r.platform]}
+                    </Badge>
                     {r.performance === 'high' && <Badge className="bg-success/10 text-success text-xs"><TrendingUp className="h-3 w-3 mr-0.5" />高表现</Badge>}
                     {r.performance === 'low' && <Badge className="bg-destructive/10 text-destructive text-xs"><TrendingDown className="h-3 w-3 mr-0.5" />低表现</Badge>}
                   </div>
@@ -475,11 +498,13 @@ export default function Records() {
       </div>
 
       {records.length === 0 && (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <p>还没有发布记录，点击「添加记录」开始追踪数据 📊</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={FileText}
+          title="还没有发布记录"
+          description="点击「添加记录」开始追踪你的短视频数据 📊"
+          actionLabel="添加记录"
+          onAction={() => setOpen(true)}
+        />
       )}
     </div>
   );

@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { BarChart3, Search, FileText, Calendar, Sun, Moon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 const navItems = [
   { to: '/', icon: BarChart3, label: '仪表盘' },
@@ -26,13 +27,14 @@ export default function AppLayout() {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="hidden md:flex w-64 flex-col border-r border-border bg-card p-4">
-        <div className="mb-8 px-2">
+      <aside className="hidden md:flex w-64 flex-col border-r border-border bg-card p-5">
+        <div className="mb-2 px-2">
           <h1 className="text-xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: 'var(--gradient-primary)' }}>
             📈 短视频增长助手
           </h1>
           <p className="text-xs text-muted-foreground mt-1">优化标题 · 提升流量</p>
         </div>
+        <Separator className="my-4" />
         <nav className="flex-1 space-y-1">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
@@ -40,26 +42,34 @@ export default function AppLayout() {
               to={to}
               end={to === '/'}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                `relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-primary text-primary-foreground'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                 }`
               }
             >
-              <Icon className="h-4 w-4" />
-              {label}
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-primary-foreground/40" />
+                  )}
+                  <Icon className={`h-4 w-4 transition-colors ${isActive ? '' : 'group-hover:text-primary'}`} />
+                  {label}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
-        <Button variant="ghost" size="sm" onClick={() => setDark(!dark)} className="mt-auto w-full justify-start gap-2 text-muted-foreground">
+        <Separator className="my-3" />
+        <Button variant="ghost" size="sm" onClick={() => setDark(!dark)} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
           {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           {dark ? '浅色模式' : '深色模式'}
         </Button>
       </aside>
 
       {/* Mobile nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card px-2 py-1">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-sm px-2 py-1.5">
         <nav className="flex justify-around">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
@@ -67,13 +77,20 @@ export default function AppLayout() {
               to={to}
               end={to === '/'}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 py-1.5 px-2 text-xs transition-colors ${
+                `flex flex-col items-center gap-0.5 py-1 px-2 text-xs transition-colors relative ${
                   isActive ? 'text-primary' : 'text-muted-foreground'
                 }`
               }
             >
-              <Icon className="h-4 w-4" />
-              {label}
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-primary" />
+                  )}
+                  <Icon className="h-4 w-4" />
+                  <span className={isActive ? 'font-medium' : ''}>{label}</span>
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
