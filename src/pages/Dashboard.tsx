@@ -1,21 +1,37 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { getRecords, getAnalyses } from '@/lib/storage';
-import { PLATFORM_LABELS, type PublishRecord } from '@/lib/types';
-import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, Sparkles, BarChart3 } from 'lucide-react';
-import { useMemo } from 'react';
+import { PLATFORM_LABELS, PLATFORM_COLORS, type PublishRecord, type Platform } from '@/lib/types';
+import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, Sparkles, BarChart3, Share2, Percent } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import EmptyState from '@/components/EmptyState';
 
+const ALL_PLATFORMS: ('all' | Platform)[] = ['all', 'douyin', 'kuaishou', 'xiaohongshu', 'bilibili'];
+
 export default function Dashboard() {
   const navigate = useNavigate();
-  const records = useMemo(() => getRecords(), []);
-  const analyses = useMemo(() => getAnalyses(), []);
+  const allRecords = useMemo(() => getRecords(), []);
+  const [platformFilter, setPlatformFilter] = useState<'all' | Platform>('all');
+
+  const records = useMemo(
+    () => platformFilter === 'all' ? allRecords : allRecords.filter(r => r.platform === platformFilter),
+    [allRecords, platformFilter]
+  );
 
   const totalViews = records.reduce((s, r) => s + r.views, 0);
   const totalLikes = records.reduce((s, r) => s + r.likes, 0);
+  const totalComments = records.reduce((s, r) => s + r.comments, 0);
+  const totalShares = records.reduce((s, r) => s + r.shares, 0);
   const avgViews = records.length ? Math.round(totalViews / records.length) : 0;
+
+  // Derived metrics
+  const engagementRate = totalViews > 0 ? ((totalLikes + totalComments + totalShares) / totalViews * 100).toFixed(2) : '0.00';
+  const likeRate = totalViews > 0 ? (totalLikes / totalViews * 100).toFixed(2) : '0.00';
+  const commentRate = totalViews > 0 ? (totalComments / totalViews * 100).toFixed(2) : '0.00';
+  const shareRate = totalViews > 0 ? (totalShares / totalViews * 100).toFixed(2) : '0.00';
 
   const chartData = useMemo(() => {
     const sorted = [...records].sort((a, b) => a.publishedAt.localeCompare(b.publishedAt)).slice(-30);
@@ -34,6 +50,20 @@ export default function Dashboard() {
     { label: '总点赞数', value: totalLikes.toLocaleString(), icon: ThumbsUp, color: 'bg-success/10 text-success' },
     { label: '平均播放', value: avgViews.toLocaleString(), icon: TrendingUp, color: 'bg-warning/10 text-warning' },
   ];
+
+  const derivedStats = [
+    { label: '综合互动率', value: `${engagementRate}%`, icon: Percent, desc: '(赞+评+转)/播放' },
+    { label: '点赞率', value: `${likeRate}%`, icon: ThumbsUp, desc: '点赞/播放' },
+    { label: '评论率', value: `${commentRate}%`, icon: MessageSquare, desc: '评论/播放' },
+    { label: '转发率', value: `${shareRate}%`, icon: Share2, desc: '分享/播放' },
+  ];
+
+  // Platform counts for filter badges
+  const platformCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: allRecords.length };
+    for (const r of allRecords) counts[r.platform] = (counts[r.platform] || 0) + 1;
+    return counts;
+  }, [allRecords]);
 
   return (
     <div className="space-y-6 page-enter">
@@ -64,6 +94,37 @@ export default function Dashboard() {
         </Button>
       </div>
 
+      {/* Platform filter */}
+      {allRecords.length > 0 && (
+        <div className="flex flex-wrap gap-2 animate-fade-in">
+          {ALL_PLATFORMS.map(p => {
+            const isActive = platformFilter === p;
+            const count = platformCounts[p] || 0;
+            if (p !== 'all' && count === 0) return null;
+            return (
+              <button
+                key={p}
+                onClick={() => setPlatformFilter(p)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
+                  isActive
+                    ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                    : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                }`}
+              >
+                {p !== 'all' && (
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: isActive ? 'hsl(0, 0%, 100%)' : PLATFORM_COLORS[p as Platform] }}
+                  />
+                )}
+                {p === 'all' ? '全部' : PLATFORM_LABELS[p as Platform]}
+                <span className={`text-[10px] ${isActive ? 'opacity-80' : 'opacity-60'}`}>({count})</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stats.map(({ label, value, icon: Icon, color }, i) => (
@@ -81,9 +142,34 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Derived engagement metrics */}
+      {records.length > 0 && (
+        <Card className="animate-fade-in-up animate-stagger-5">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Percent className="h-4 w-4 text-primary" /> 互动率指标
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {derivedStats.map(({ label, value, icon: Icon, desc }) => (
+                <div key={label} className="text-center p-3 rounded-xl bg-secondary/40 hover:bg-secondary/60 transition-colors">
+                  <div className="flex items-center justify-center gap-1.5 mb-1">
+                    <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">{label}</span>
+                  </div>
+                  <div className="text-lg font-bold text-foreground">{value}</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">{desc}</div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Chart */}
       {chartData.length > 1 && (
-        <Card className="animate-fade-in-up animate-stagger-5">
+        <Card className="animate-fade-in-up">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">播放量趋势</CardTitle>
           </CardHeader>
@@ -117,9 +203,12 @@ export default function Dashboard() {
           <CardContent className="space-y-2">
             {recentRecords.map(r => (
               <div key={r.id} className="flex items-center justify-between py-2 border-b border-border last:border-0 transition-colors hover:bg-secondary/30 rounded px-2 -mx-2">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{r.title}</p>
-                  <p className="text-xs text-muted-foreground">{PLATFORM_LABELS[r.platform]} · {r.publishedAt}</p>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: PLATFORM_COLORS[r.platform] }} />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate">{r.title}</p>
+                    <p className="text-xs text-muted-foreground">{PLATFORM_LABELS[r.platform]} · {r.publishedAt}</p>
+                  </div>
                 </div>
                 <div className="text-sm font-medium text-right shrink-0 ml-4">
                   {r.views.toLocaleString()} 播放
@@ -130,7 +219,7 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {records.length === 0 && (
+      {allRecords.length === 0 && (
         <Card className="animate-fade-in-up">
           <CardContent className="p-0">
             <EmptyState
@@ -140,7 +229,6 @@ export default function Dashboard() {
               actionLabel="添加第一条记录"
               onAction={() => navigate('/records')}
             />
-            {/* Onboarding steps */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 px-6 pb-8">
               {[
                 { step: '1', title: '分析标题', desc: '用 AI 优化你的标题和关键词', action: () => navigate('/analyze') },
