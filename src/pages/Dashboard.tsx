@@ -6,7 +6,7 @@ import { getRecords, getAnalyses } from '@/lib/storage';
 import { PLATFORM_LABELS, PLATFORM_COLORS, type PublishRecord, type Platform } from '@/lib/types';
 import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, Sparkles, BarChart3, Share2, Percent } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import EmptyState from '@/components/EmptyState';
 
 const ALL_PLATFORMS: ('all' | Platform)[] = ['all', 'douyin', 'kuaishou', 'xiaohongshu', 'bilibili'];
@@ -64,6 +64,27 @@ export default function Dashboard() {
     for (const r of allRecords) counts[r.platform] = (counts[r.platform] || 0) + 1;
     return counts;
   }, [allRecords]);
+
+  // Pie chart data: views/likes by platform
+  const pieData = useMemo(() => {
+    const map: Record<string, { views: number; likes: number }> = {};
+    for (const r of allRecords) {
+      if (!map[r.platform]) map[r.platform] = { views: 0, likes: 0 };
+      map[r.platform].views += r.views;
+      map[r.platform].likes += r.likes;
+    }
+    return Object.entries(map)
+      .map(([platform, data]) => ({
+        name: PLATFORM_LABELS[platform as Platform],
+        platform: platform as Platform,
+        views: data.views,
+        likes: data.likes,
+      }))
+      .filter(d => d.views > 0)
+      .sort((a, b) => b.views - a.views);
+  }, [allRecords]);
+
+  const PIE_COLORS = pieData.map(d => PLATFORM_COLORS[d.platform]);
 
   return (
     <div className="space-y-6 page-enter">
@@ -165,6 +186,72 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Platform distribution pie charts */}
+      {pieData.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in-up">
+          <Card className="card-hover">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">📊 播放量平台分布</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="views"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      innerRadius={40}
+                      paddingAngle={3}
+                      strokeWidth={0}
+                    >
+                      {pieData.map((_, i) => (
+                        <Cell key={i} fill={PIE_COLORS[i]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => value.toLocaleString()} />
+                    <Legend iconType="circle" iconSize={8} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="card-hover">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">👍 点赞数平台分布</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="likes"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      innerRadius={40}
+                      paddingAngle={3}
+                      strokeWidth={0}
+                    >
+                      {pieData.map((_, i) => (
+                        <Cell key={i} fill={PIE_COLORS[i]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => value.toLocaleString()} />
+                    <Legend iconType="circle" iconSize={8} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Chart */}
