@@ -12,7 +12,7 @@ import { exportToCSV, parseCSV } from '@/lib/csv';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
 import { useRef } from 'react';
 
 interface ReviewResult {
@@ -240,6 +240,114 @@ export default function Records() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Comparison Charts */}
+              {(() => {
+                const selected = records.filter(r => selectedIds.has(r.id));
+                const high = selected.filter(r => r.performance === 'high');
+                const low = selected.filter(r => r.performance === 'low');
+                const normal = selected.filter(r => r.performance !== 'high' && r.performance !== 'low');
+
+                const avg = (arr: PublishRecord[], key: keyof Pick<PublishRecord, 'views' | 'likes' | 'comments' | 'shares'>) =>
+                  arr.length ? Math.round(arr.reduce((s, r) => s + r[key], 0) / arr.length) : 0;
+
+                const barData = [
+                  { metric: '播放量', high: avg(high, 'views'), low: avg(low, 'views'), normal: avg(normal, 'views') },
+                  { metric: '点赞', high: avg(high, 'likes'), low: avg(low, 'likes'), normal: avg(normal, 'likes') },
+                  { metric: '评论', high: avg(high, 'comments'), low: avg(low, 'comments'), normal: avg(normal, 'comments') },
+                  { metric: '分享', high: avg(high, 'shares'), low: avg(low, 'shares'), normal: avg(normal, 'shares') },
+                ];
+
+                const hasGroups = high.length > 0 || low.length > 0;
+
+                // Radar data: normalize each metric to 0-100 scale
+                const maxViews = Math.max(...selected.map(r => r.views), 1);
+                const maxLikes = Math.max(...selected.map(r => r.likes), 1);
+                const maxComments = Math.max(...selected.map(r => r.comments), 1);
+                const maxShares = Math.max(...selected.map(r => r.shares), 1);
+
+                const radarData = [
+                  { metric: '播放量', high: Math.round(avg(high, 'views') / maxViews * 100), low: Math.round(avg(low, 'views') / maxViews * 100) },
+                  { metric: '点赞', high: Math.round(avg(high, 'likes') / maxLikes * 100), low: Math.round(avg(low, 'likes') / maxLikes * 100) },
+                  { metric: '评论', high: Math.round(avg(high, 'comments') / maxComments * 100), low: Math.round(avg(low, 'comments') / maxComments * 100) },
+                  { metric: '分享', high: Math.round(avg(high, 'shares') / maxShares * 100), low: Math.round(avg(low, 'shares') / maxShares * 100) },
+                ];
+
+                // Per-record comparison bar chart
+                const perRecordData = selected.map(r => ({
+                  title: r.title.slice(0, 6) + (r.title.length > 6 ? '..' : ''),
+                  views: r.views,
+                  likes: r.likes,
+                  fill: r.performance === 'high' ? 'hsl(152, 60%, 42%)' : r.performance === 'low' ? 'hsl(0, 84%, 60%)' : 'hsl(250, 75%, 58%)',
+                }));
+
+                return (
+                  <>
+                    {/* Per record views comparison */}
+                    <div className="p-3 rounded-lg bg-card">
+                      <p className="text-sm font-medium mb-2">📊 选中记录播放量对比</p>
+                      <div className="h-44">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={perRecordData}>
+                            <XAxis dataKey="title" tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
+                            <YAxis tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
+                            <Tooltip />
+                            <Bar dataKey="views" name="播放量" radius={[4, 4, 0, 0]}>
+                              {perRecordData.map((entry, i) => (
+                                <Cell key={i} fill={entry.fill} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex gap-4 justify-center mt-2 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-success inline-block" />高表现</span>
+                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-destructive inline-block" />低表现</span>
+                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: 'hsl(250, 75%, 58%)' }} />普通</span>
+                      </div>
+                    </div>
+
+                    {/* Grouped average comparison */}
+                    {hasGroups && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="p-3 rounded-lg bg-card">
+                          <p className="text-sm font-medium mb-2">📈 高/低表现平均数据对比</p>
+                          <div className="h-44">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart data={barData} barGap={2}>
+                                <XAxis dataKey="metric" tick={{ fontSize: 11 }} stroke="hsl(220, 10%, 46%)" />
+                                <YAxis tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
+                                <Tooltip />
+                                {high.length > 0 && <Bar dataKey="high" name="高表现" fill="hsl(152, 60%, 42%)" radius={[3, 3, 0, 0]} />}
+                                {low.length > 0 && <Bar dataKey="low" name="低表现" fill="hsl(0, 84%, 60%)" radius={[3, 3, 0, 0]} />}
+                                {normal.length > 0 && <Bar dataKey="normal" name="普通" fill="hsl(250, 75%, 58%)" radius={[3, 3, 0, 0]} />}
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
+
+                        {high.length > 0 && low.length > 0 && (
+                          <div className="p-3 rounded-lg bg-card">
+                            <p className="text-sm font-medium mb-2">🎯 雷达对比（归一化）</p>
+                            <div className="h-44">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="70%">
+                                  <PolarGrid stroke="hsl(220, 15%, 90%)" />
+                                  <PolarAngleAxis dataKey="metric" tick={{ fontSize: 11 }} />
+                                  <PolarRadiusAxis tick={false} axisLine={false} />
+                                  <Radar name="高表现" dataKey="high" stroke="hsl(152, 60%, 42%)" fill="hsl(152, 60%, 42%)" fillOpacity={0.25} />
+                                  <Radar name="低表现" dataKey="low" stroke="hsl(0, 84%, 60%)" fill="hsl(0, 84%, 60%)" fillOpacity={0.25} />
+                                  <Tooltip />
+                                </RadarChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+
               {/* Summary */}
               <div className="p-3 rounded-lg bg-card">
                 <p className="text-sm font-medium mb-1">📊 总体表现</p>
