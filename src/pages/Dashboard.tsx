@@ -11,15 +11,33 @@ import EmptyState from '@/components/EmptyState';
 
 const ALL_PLATFORMS: ('all' | Platform)[] = ['all', 'douyin', 'kuaishou', 'xiaohongshu', 'bilibili'];
 
+type TimeRange = '7d' | '30d' | 'all';
+const TIME_RANGES: { value: TimeRange; label: string }[] = [
+  { value: '7d', label: '最近 7 天' },
+  { value: '30d', label: '最近 30 天' },
+  { value: 'all', label: '全部' },
+];
+
+function getDateThreshold(range: TimeRange): string | null {
+  if (range === 'all') return null;
+  const d = new Date();
+  d.setDate(d.getDate() - (range === '7d' ? 7 : 30));
+  return d.toISOString().slice(0, 10);
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const allRecords = useMemo(() => getRecords(), []);
   const [platformFilter, setPlatformFilter] = useState<'all' | Platform>('all');
+  const [timeRange, setTimeRange] = useState<TimeRange>('all');
 
-  const records = useMemo(
-    () => platformFilter === 'all' ? allRecords : allRecords.filter(r => r.platform === platformFilter),
-    [allRecords, platformFilter]
-  );
+  const records = useMemo(() => {
+    let filtered = allRecords;
+    if (platformFilter !== 'all') filtered = filtered.filter(r => r.platform === platformFilter);
+    const threshold = getDateThreshold(timeRange);
+    if (threshold) filtered = filtered.filter(r => r.publishedAt >= threshold);
+    return filtered;
+  }, [allRecords, platformFilter, timeRange]);
 
   const totalViews = records.reduce((s, r) => s + r.views, 0);
   const totalLikes = records.reduce((s, r) => s + r.likes, 0);
