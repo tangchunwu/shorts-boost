@@ -6,6 +6,7 @@ import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, BarChart3, 
 import { useMemo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import EmptyState from '@/components/EmptyState';
+import CompetitorCompare from '@/components/CompetitorCompare';
 import { useRecords } from '@/hooks/useCloudData';
 
 const ALL_PLATFORMS: ('all' | Platform)[] = ['all', 'douyin', 'kuaishou', 'xiaohongshu', 'bilibili'];
@@ -261,6 +262,8 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       )}
+
+      <CompetitorCompare />
 
       {allRecords.length === 0 && (
         <Card className="animate-fade-in-up">
