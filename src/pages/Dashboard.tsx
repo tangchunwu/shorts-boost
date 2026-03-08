@@ -227,16 +227,16 @@ export default function Dashboard() {
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
-                  <defs>
+                   <defs>
                     <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(250, 75%, 58%)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(250, 75%, 58%)" stopOpacity={0} />
+                      <stop offset="5%" stopColor="hsl(220, 25%, 55%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(220, 25%, 55%)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(220, 10%, 46%)" />
-                  <YAxis tick={{ fontSize: 11 }} stroke="hsl(220, 10%, 46%)" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(220, 8%, 50%)" />
+                  <YAxis tick={{ fontSize: 11 }} stroke="hsl(220, 8%, 50%)" />
                   <Tooltip />
-                  <Area type="monotone" dataKey="views" stroke="hsl(250, 75%, 58%)" fill="url(#viewsGrad)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="views" stroke="hsl(220, 25%, 55%)" fill="url(#viewsGrad)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
