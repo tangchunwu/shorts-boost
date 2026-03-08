@@ -1,13 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { getRecords, getAnalyses } from '@/lib/storage';
 import { PLATFORM_LABELS, PLATFORM_COLORS, type PublishRecord, type Platform } from '@/lib/types';
-import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, Sparkles, BarChart3, Share2, Percent } from 'lucide-react';
+import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, BarChart3, Share2, Percent } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import EmptyState from '@/components/EmptyState';
+import { useRecords } from '@/hooks/useCloudData';
 
 const ALL_PLATFORMS: ('all' | Platform)[] = ['all', 'douyin', 'kuaishou', 'xiaohongshu', 'bilibili'];
 
@@ -27,7 +26,7 @@ function getDateThreshold(range: TimeRange): string | null {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const allRecords = useMemo(() => getRecords(), []);
+  const { data: allRecords = [], isLoading } = useRecords();
   const [platformFilter, setPlatformFilter] = useState<'all' | Platform>('all');
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
 
@@ -45,7 +44,6 @@ export default function Dashboard() {
   const totalShares = records.reduce((s, r) => s + r.shares, 0);
   const avgViews = records.length ? Math.round(totalViews / records.length) : 0;
 
-  // Derived metrics
   const engagementRate = totalViews > 0 ? ((totalLikes + totalComments + totalShares) / totalViews * 100).toFixed(2) : '0.00';
   const likeRate = totalViews > 0 ? (totalLikes / totalViews * 100).toFixed(2) : '0.00';
   const commentRate = totalViews > 0 ? (totalComments / totalViews * 100).toFixed(2) : '0.00';
@@ -53,11 +51,7 @@ export default function Dashboard() {
 
   const chartData = useMemo(() => {
     const sorted = [...records].sort((a, b) => a.publishedAt.localeCompare(b.publishedAt)).slice(-30);
-    return sorted.map(r => ({
-      date: r.publishedAt.slice(5, 10),
-      views: r.views,
-      likes: r.likes,
-    }));
+    return sorted.map(r => ({ date: r.publishedAt.slice(5, 10), views: r.views, likes: r.likes }));
   }, [records]);
 
   const recentRecords = records.slice(0, 5);
@@ -76,14 +70,12 @@ export default function Dashboard() {
     { label: '转发率', value: `${shareRate}%`, icon: Share2, desc: '分享/播放' },
   ];
 
-  // Platform counts for filter badges
   const platformCounts = useMemo(() => {
     const counts: Record<string, number> = { all: allRecords.length };
     for (const r of allRecords) counts[r.platform] = (counts[r.platform] || 0) + 1;
     return counts;
   }, [allRecords]);
 
-  // Pie chart data: views/likes by platform
   const pieData = useMemo(() => {
     const map: Record<string, { views: number; likes: number }> = {};
     for (const r of allRecords) {
@@ -92,17 +84,16 @@ export default function Dashboard() {
       map[r.platform].likes += r.likes;
     }
     return Object.entries(map)
-      .map(([platform, data]) => ({
-        name: PLATFORM_LABELS[platform as Platform],
-        platform: platform as Platform,
-        views: data.views,
-        likes: data.likes,
-      }))
+      .map(([platform, data]) => ({ name: PLATFORM_LABELS[platform as Platform], platform: platform as Platform, views: data.views, likes: data.likes }))
       .filter(d => d.views > 0)
       .sort((a, b) => b.views - a.views);
   }, [allRecords]);
 
   const PIE_COLORS = pieData.map(d => PLATFORM_COLORS[d.platform]);
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>;
+  }
 
   return (
     <div className="space-y-6 page-enter">
@@ -111,21 +102,16 @@ export default function Dashboard() {
         <p className="text-muted-foreground text-sm mt-1">短视频数据概览与快速操作</p>
       </div>
 
-      {/* Quick actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Button onClick={() => navigate('/analyze')} className="h-auto py-4 justify-start gap-3 card-hover" style={{ backgroundImage: 'var(--gradient-primary)' }}>
-          <div className="rounded-lg bg-primary-foreground/15 p-2">
-            <Search className="h-5 w-5" />
-          </div>
+          <div className="rounded-lg bg-primary-foreground/15 p-2"><Search className="h-5 w-5" /></div>
           <div className="text-left">
             <div className="font-semibold">新建 SEO 分析</div>
             <div className="text-xs opacity-80">AI 优化标题和关键词</div>
           </div>
         </Button>
         <Button onClick={() => navigate('/records')} variant="outline" className="h-auto py-4 justify-start gap-3 card-hover">
-          <div className="rounded-lg bg-muted p-2">
-            <FileText className="h-5 w-5 text-muted-foreground" />
-          </div>
+          <div className="rounded-lg bg-muted p-2"><FileText className="h-5 w-5 text-muted-foreground" /></div>
           <div className="text-left">
             <div className="font-semibold">添加发布记录</div>
             <div className="text-xs text-muted-foreground">记录和复盘视频表现</div>
@@ -133,50 +119,26 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* Filters */}
       {allRecords.length > 0 && (
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 animate-fade-in">
-          {/* Time range */}
           <div className="flex gap-1.5 bg-secondary/50 rounded-lg p-1">
             {TIME_RANGES.map(({ value, label }) => (
-              <button
-                key={value}
-                onClick={() => setTimeRange(value)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
-                  timeRange === value
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
+              <button key={value} onClick={() => setTimeRange(value)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${timeRange === value ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
                 {label}
               </button>
             ))}
           </div>
-
           <div className="h-5 w-px bg-border hidden sm:block" />
-
-          {/* Platform filter */}
           <div className="flex flex-wrap gap-2">
             {ALL_PLATFORMS.map(p => {
               const isActive = platformFilter === p;
               const count = platformCounts[p] || 0;
               if (p !== 'all' && count === 0) return null;
               return (
-                <button
-                  key={p}
-                  onClick={() => setPlatformFilter(p)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
-                    isActive
-                      ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                      : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                  }`}
-                >
-                  {p !== 'all' && (
-                    <span
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: isActive ? 'hsl(0, 0%, 100%)' : PLATFORM_COLORS[p as Platform] }}
-                    />
-                  )}
+                <button key={p} onClick={() => setPlatformFilter(p)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${isActive ? 'border-primary bg-primary text-primary-foreground shadow-sm' : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'}`}>
+                  {p !== 'all' && <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: isActive ? 'hsl(0, 0%, 100%)' : PLATFORM_COLORS[p as Platform] }} />}
                   {p === 'all' ? '全部' : PLATFORM_LABELS[p as Platform]}
                   <span className={`text-[10px] ${isActive ? 'opacity-80' : 'opacity-60'}`}>({count})</span>
                 </button>
@@ -186,15 +148,12 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stats.map(({ label, value, icon: Icon, color }, i) => (
           <Card key={label} className={`card-hover animate-fade-in-up animate-stagger-${i + 1}`}>
             <CardContent className="p-4">
               <div className="flex items-center gap-2.5 mb-2">
-                <div className={`rounded-lg p-1.5 ${color}`}>
-                  <Icon className="h-3.5 w-3.5" />
-                </div>
+                <div className={`rounded-lg p-1.5 ${color}`}><Icon className="h-3.5 w-3.5" /></div>
                 <span className="text-xs text-muted-foreground">{label}</span>
               </div>
               <div className="text-xl font-bold">{value}</div>
@@ -203,22 +162,16 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Derived engagement metrics */}
       {records.length > 0 && (
         <Card className="animate-fade-in-up animate-stagger-5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Percent className="h-4 w-4 text-primary" /> 互动率指标
-            </CardTitle>
+            <CardTitle className="text-base flex items-center gap-2"><Percent className="h-4 w-4 text-primary" /> 互动率指标</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {derivedStats.map(({ label, value, icon: Icon, desc }) => (
                 <div key={label} className="text-center p-3 rounded-xl bg-secondary/40 hover:bg-secondary/60 transition-colors">
-                  <div className="flex items-center justify-center gap-1.5 mb-1">
-                    <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">{label}</span>
-                  </div>
+                  <div className="flex items-center justify-center gap-1.5 mb-1"><Icon className="h-3.5 w-3.5 text-muted-foreground" /><span className="text-xs text-muted-foreground">{label}</span></div>
                   <div className="text-lg font-bold text-foreground">{value}</div>
                   <div className="text-[10px] text-muted-foreground mt-0.5">{desc}</div>
                 </div>
@@ -228,31 +181,16 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Platform distribution pie charts */}
       {pieData.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in-up">
           <Card className="card-hover">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">📊 播放量平台分布</CardTitle>
-            </CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-base">📊 播放量平台分布</CardTitle></CardHeader>
             <CardContent>
               <div className="h-56">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={pieData}
-                      dataKey="views"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      innerRadius={40}
-                      paddingAngle={3}
-                      strokeWidth={0}
-                    >
-                      {pieData.map((_, i) => (
-                        <Cell key={i} fill={PIE_COLORS[i]} />
-                      ))}
+                    <Pie data={pieData} dataKey="views" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={40} paddingAngle={3} strokeWidth={0}>
+                      {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
                     </Pie>
                     <Tooltip formatter={(value: number) => value.toLocaleString()} />
                     <Legend iconType="circle" iconSize={8} />
@@ -262,27 +200,13 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           <Card className="card-hover">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">👍 点赞数平台分布</CardTitle>
-            </CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-base">👍 点赞数平台分布</CardTitle></CardHeader>
             <CardContent>
               <div className="h-56">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={pieData}
-                      dataKey="likes"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      innerRadius={40}
-                      paddingAngle={3}
-                      strokeWidth={0}
-                    >
-                      {pieData.map((_, i) => (
-                        <Cell key={i} fill={PIE_COLORS[i]} />
-                      ))}
+                    <Pie data={pieData} dataKey="likes" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={40} paddingAngle={3} strokeWidth={0}>
+                      {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
                     </Pie>
                     <Tooltip formatter={(value: number) => value.toLocaleString()} />
                     <Legend iconType="circle" iconSize={8} />
@@ -294,12 +218,9 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Chart */}
       {chartData.length > 1 && (
         <Card className="animate-fade-in-up">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">播放量趋势</CardTitle>
-          </CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-base">播放量趋势</CardTitle></CardHeader>
           <CardContent>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
@@ -321,12 +242,9 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Recent records */}
       {recentRecords.length > 0 && (
         <Card className="animate-fade-in-up">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">最近发布</CardTitle>
-          </CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-base">最近发布</CardTitle></CardHeader>
           <CardContent className="space-y-2">
             {recentRecords.map(r => (
               <div key={r.id} className="flex items-center justify-between py-2 border-b border-border last:border-0 transition-colors hover:bg-secondary/30 rounded px-2 -mx-2">
@@ -337,9 +255,7 @@ export default function Dashboard() {
                     <p className="text-xs text-muted-foreground">{PLATFORM_LABELS[r.platform]} · {r.publishedAt}</p>
                   </div>
                 </div>
-                <div className="text-sm font-medium text-right shrink-0 ml-4">
-                  {r.views.toLocaleString()} 播放
-                </div>
+                <div className="text-sm font-medium text-right shrink-0 ml-4">{r.views.toLocaleString()} 播放</div>
               </div>
             ))}
           </CardContent>
@@ -349,24 +265,14 @@ export default function Dashboard() {
       {allRecords.length === 0 && (
         <Card className="animate-fade-in-up">
           <CardContent className="p-0">
-            <EmptyState
-              icon={BarChart3}
-              title="还没有发布记录"
-              description="开始添加你的短视频数据，追踪增长趋势 🚀"
-              actionLabel="添加第一条记录"
-              onAction={() => navigate('/records')}
-            />
+            <EmptyState icon={BarChart3} title="还没有发布记录" description="开始添加你的短视频数据，追踪增长趋势 🚀" actionLabel="添加第一条记录" onAction={() => navigate('/records')} />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 px-6 pb-8">
               {[
                 { step: '1', title: '分析标题', desc: '用 AI 优化你的标题和关键词', action: () => navigate('/analyze') },
                 { step: '2', title: '记录数据', desc: '记录每条视频的播放和互动数据', action: () => navigate('/records') },
                 { step: '3', title: 'AI 复盘', desc: '选择记录让 AI 分析成功规律', action: () => navigate('/records') },
               ].map(({ step, title, desc, action }) => (
-                <button
-                  key={step}
-                  onClick={action}
-                  className="text-left p-4 rounded-xl border border-border bg-secondary/30 hover:bg-secondary/60 transition-all duration-200 hover:-translate-y-0.5 group"
-                >
+                <button key={step} onClick={action} className="text-left p-4 rounded-xl border border-border bg-secondary/30 hover:bg-secondary/60 transition-all duration-200 hover:-translate-y-0.5 group">
                   <div className="text-xs font-bold text-primary mb-1">第 {step} 步</div>
                   <div className="text-sm font-semibold mb-0.5 group-hover:text-primary transition-colors">{title}</div>
                   <div className="text-xs text-muted-foreground">{desc}</div>

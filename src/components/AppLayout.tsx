@@ -1,9 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload } from 'lucide-react';
+import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { downloadBackup, restoreFromBackup } from '@/lib/storage';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 const navItems = [
@@ -14,6 +15,7 @@ const navItems = [
 ];
 
 export default function AppLayout() {
+  const { user, signOut } = useAuth();
   const [dark, setDark] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') === 'dark';
@@ -43,6 +45,11 @@ export default function AppLayout() {
     document.documentElement.classList.toggle('dark', dark);
     localStorage.setItem('theme', dark ? 'dark' : 'light');
   }, [dark]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success('已退出登录');
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -95,6 +102,16 @@ export default function AppLayout() {
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             {dark ? '浅色模式' : '深色模式'}
           </Button>
+          {user && (
+            <>
+              <div className="px-2 py-1.5">
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive">
+                <LogOut className="h-4 w-4" /> 退出登录
+              </Button>
+            </>
+          )}
         </div>
       </aside>
 
