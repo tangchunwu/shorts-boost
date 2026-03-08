@@ -1,8 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { BarChart3, Search, FileText, Calendar, Sun, Moon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { downloadBackup, restoreFromBackup } from '@/lib/storage';
+import { toast } from 'sonner';
 
 const navItems = [
   { to: '/', icon: BarChart3, label: '仪表盘' },
@@ -18,6 +20,24 @@ export default function AppLayout() {
     }
     return false;
   });
+  const restoreInputRef = useRef<HTMLInputElement>(null);
+
+  const handleRestore = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = restoreFromBackup(ev.target?.result as string);
+      if (result.success && result.counts) {
+        toast.success(`恢复成功：${result.counts.records} 条记录、${result.counts.analyses} 条分析、${result.counts.calendar} 条日历`);
+        window.location.reload();
+      } else {
+        toast.error(result.error || '恢复失败');
+      }
+    };
+    reader.readAsText(file);
+    if (restoreInputRef.current) restoreInputRef.current.value = '';
+  };
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
@@ -62,10 +82,20 @@ export default function AppLayout() {
           ))}
         </nav>
         <Separator className="my-3" />
-        <Button variant="ghost" size="sm" onClick={() => setDark(!dark)} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
-          {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          {dark ? '浅色模式' : '深色模式'}
-        </Button>
+        <div className="space-y-1">
+          <Button variant="ghost" size="sm" onClick={() => { downloadBackup(); toast.success('备份已下载'); }} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
+            <Download className="h-4 w-4" /> 备份数据
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => restoreInputRef.current?.click()} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
+            <Upload className="h-4 w-4" /> 恢复数据
+          </Button>
+          <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
+          <Separator className="my-2" />
+          <Button variant="ghost" size="sm" onClick={() => setDark(!dark)} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {dark ? '浅色模式' : '深色模式'}
+          </Button>
+        </div>
       </aside>
 
       {/* Mobile nav */}
