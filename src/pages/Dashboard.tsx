@@ -2,13 +2,15 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PLATFORM_LABELS, PLATFORM_COLORS, type PublishRecord, type Platform } from '@/lib/types';
-import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, BarChart3, Share2, Percent } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, BarChart3, Share2, Percent, Download } from 'lucide-react';
+import { useMemo, useState, useCallback } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import EmptyState from '@/components/EmptyState';
 import CompetitorCompare from '@/components/CompetitorCompare';
-import AIInsightsCard from '@/components/AIInsightsCard';
+import AIInsightsCard, { type Insight } from '@/components/AIInsightsCard';
 import { useRecords } from '@/hooks/useCloudData';
+import { exportDashboardPDF } from '@/lib/exportPDF';
+import { toast } from 'sonner';
 
 const ALL_PLATFORMS: ('all' | Platform)[] = ['all', 'douyin', 'kuaishou', 'xiaohongshu', 'bilibili'];
 
@@ -31,6 +33,8 @@ export default function Dashboard() {
   const { data: allRecords = [], isLoading } = useRecords();
   const [platformFilter, setPlatformFilter] = useState<'all' | Platform>('all');
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
+  const [aiInsights, setAiInsights] = useState<Insight[]>([]);
+  const [exporting, setExporting] = useState(false);
 
   const records = useMemo(() => {
     let filtered = allRecords;
@@ -39,6 +43,19 @@ export default function Dashboard() {
     if (threshold) filtered = filtered.filter(r => r.publishedAt >= threshold);
     return filtered;
   }, [allRecords, platformFilter, timeRange]);
+
+  const handleExportPDF = useCallback(async () => {
+    setExporting(true);
+    try {
+      await exportDashboardPDF({ records, insights: aiInsights, platformFilter, timeRange });
+      toast.success('PDF 报告已下载');
+    } catch (e) {
+      console.error('Export PDF error:', e);
+      toast.error('导出失败，请重试');
+    } finally {
+      setExporting(false);
+    }
+  }, [records, aiInsights, platformFilter, timeRange]);
 
   const totalViews = records.reduce((s, r) => s + r.views, 0);
   const totalLikes = records.reduce((s, r) => s + r.likes, 0);
@@ -99,9 +116,17 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 page-enter">
-      <div>
-        <h1 className="text-2xl font-bold">仪表盘</h1>
-        <p className="text-muted-foreground text-sm mt-1">短视频数据概览与快速操作</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">仪表盘</h1>
+          <p className="text-muted-foreground text-sm mt-1">短视频数据概览与快速操作</p>
+        </div>
+        {allRecords.length > 0 && (
+          <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={exporting} className="gap-2">
+            <Download className={`h-4 w-4 ${exporting ? 'animate-spin' : ''}`} />
+            {exporting ? '导出中...' : '导出报告'}
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -264,7 +289,7 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {allRecords.length > 0 && <AIInsightsCard records={allRecords} />}
+      {allRecords.length > 0 && <AIInsightsCard records={allRecords} onInsightsChange={setAiInsights} />}
 
       <CompetitorCompare />
 
