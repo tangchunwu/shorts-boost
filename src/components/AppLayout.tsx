@@ -20,6 +20,24 @@ export default function AppLayout() {
     }
     return false;
   });
+  const restoreInputRef = useRef<HTMLInputElement>(null);
+
+  const handleRestore = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = restoreFromBackup(ev.target?.result as string);
+      if (result.success && result.counts) {
+        toast.success(`恢复成功：${result.counts.records} 条记录、${result.counts.analyses} 条分析、${result.counts.calendar} 条日历`);
+        window.location.reload();
+      } else {
+        toast.error(result.error || '恢复失败');
+      }
+    };
+    reader.readAsText(file);
+    if (restoreInputRef.current) restoreInputRef.current.value = '';
+  };
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
