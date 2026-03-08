@@ -90,7 +90,7 @@ export function useAnalyses() {
         inputTitle: a.input_title,
         inputScript: a.input_script,
         platform: a.platform as Platform,
-        suggestions: a.suggestions as SEOSuggestion | null,
+        suggestions: a.suggestions as unknown as SEOSuggestion | null,
         createdAt: a.created_at.slice(0, 10),
       }));
     },
