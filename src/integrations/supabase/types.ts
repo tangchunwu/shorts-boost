@@ -14,7 +14,146 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analyses: {
+        Row: {
+          created_at: string
+          id: string
+          input_script: string
+          input_title: string
+          platform: string
+          suggestions: Json | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          input_script?: string
+          input_title?: string
+          platform: string
+          suggestions?: Json | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          input_script?: string
+          input_title?: string
+          platform?: string
+          suggestions?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      calendar_events: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          platform: string
+          record_id: string | null
+          status: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          platform: string
+          record_id?: string | null
+          status?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          platform?: string
+          record_id?: string | null
+          status?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      records: {
+        Row: {
+          comments: number
+          created_at: string
+          id: string
+          likes: number
+          performance: string
+          platform: string
+          published_at: string
+          shares: number
+          tags: string[]
+          title: string
+          user_id: string
+          views: number
+        }
+        Insert: {
+          comments?: number
+          created_at?: string
+          id?: string
+          likes?: number
+          performance?: string
+          platform: string
+          published_at: string
+          shares?: number
+          tags?: string[]
+          title: string
+          user_id: string
+          views?: number
+        }
+        Update: {
+          comments?: number
+          created_at?: string
+          id?: string
+          likes?: number
+          performance?: string
+          platform?: string
+          published_at?: string
+          shares?: number
+          tags?: string[]
+          title?: string
+          user_id?: string
+          views?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
