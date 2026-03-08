@@ -8,10 +8,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Platform, PLATFORM_LABELS, PublishRecord } from '@/lib/types';
 import { getRecords, saveRecord, deleteRecord } from '@/lib/storage';
+import { exportToCSV, parseCSV } from '@/lib/csv';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star } from 'lucide-react';
+import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useRef } from 'react';
 
 interface ReviewResult {
   summary: string;
@@ -27,10 +29,33 @@ export default function Records() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [reviewing, setReviewing] = useState(false);
   const [reviewResult, setReviewResult] = useState<ReviewResult | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     title: '', platform: 'douyin' as Platform, publishedAt: new Date().toISOString().slice(0, 10),
     views: '', likes: '', comments: '', shares: '', tags: '',
   });
+
+  const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      const { records: imported, errors } = parseCSV(text);
+      if (imported.length === 0) {
+        toast.error(errors[0] || '未找到有效数据');
+        return;
+      }
+      imported.forEach(r => saveRecord(r));
+      setRecords(getRecords());
+      toast.success(`成功导入 ${imported.length} 条记录`);
+      if (errors.length > 0) {
+        toast.warning(`${errors.length} 条记录有问题`, { description: errors[0] });
+      }
+    };
+    reader.readAsText(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const chartData = useMemo(() => {
     return [...records].sort((a, b) => a.publishedAt.localeCompare(b.publishedAt)).slice(-20).map(r => ({
@@ -133,7 +158,17 @@ export default function Records() {
           <h1 className="text-2xl font-bold">发布记录</h1>
           <p className="text-muted-foreground text-sm mt-1">记录和复盘短视频表现</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1">
+            <Upload className="h-3.5 w-3.5" /> 导入 CSV
+          </Button>
+          <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleImportCSV} />
+          {records.length > 0 && (
+            <Button variant="outline" size="sm" onClick={() => { exportToCSV(records); toast.success('已导出 CSV'); }} className="gap-1">
+              <Download className="h-3.5 w-3.5" /> 导出
+            </Button>
+          )}
+          <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button style={{ backgroundImage: 'var(--gradient-primary)' }}>
               <Plus className="h-4 w-4 mr-1" /> 添加记录
