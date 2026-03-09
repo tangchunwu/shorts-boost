@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import OnboardingDialog from '@/components/OnboardingDialog';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PLATFORM_LABELS, PLATFORM_COLORS, type PublishRecord, type Platform } from '@/lib/types';
@@ -145,7 +145,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 page-enter">
-      <OnboardingDialog />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">{getGreeting()}{isGuest ? '，访客' : user?.email ? `，${user.email.split('@')[0]}` : ''}</h1>
