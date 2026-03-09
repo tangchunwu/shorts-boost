@@ -125,8 +125,8 @@ export default function AppLayout() {
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar — Frosted glass panel */}
-        <aside className="hidden md:flex w-[264px] flex-col p-4">
-          <div className="flex-1 flex flex-col rounded-[28px] bg-card p-5" style={{ boxShadow: 'var(--shadow-card)', border: '1px solid var(--glass-border-outer)' }}>
+        <aside className="hidden md:flex w-[264px] flex-col p-4 sticky top-0 max-h-screen">
+          <div className="flex-1 flex flex-col min-h-0 rounded-[28px] bg-card p-5" style={{ boxShadow: 'var(--shadow-card)', border: '1px solid var(--glass-border-outer)' }}>
             <div className="mb-1 px-1">
               <h1 className="text-base font-extrabold tracking-tight text-foreground">
                 📈 短视频增长助手
@@ -134,7 +134,7 @@ export default function AppLayout() {
               <p className="zen-label mt-1.5">优化标题 · 提升流量</p>
             </div>
             <Separator className="my-4 bg-border/50" />
-            <nav className="flex-1 space-y-1">
+            <nav className="flex-1 space-y-1 overflow-y-auto min-h-0">
               {navItems.map(({ to, icon: Icon, label, tourId }) => (
                 <NavLink
                   key={to}
@@ -156,7 +156,7 @@ export default function AppLayout() {
               ))}
             </nav>
             <Separator className="my-3 bg-border/50" />
-            <div className="space-y-0.5">
+            <div className="space-y-0.5 shrink-0">
               <button onClick={() => { downloadBackup(); toast.success('备份已下载'); }} className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all active:scale-[0.97]">
                 <Download className="h-4 w-4" strokeWidth={1.5} /> 备份数据
               </button>
