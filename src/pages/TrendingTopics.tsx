@@ -36,9 +36,9 @@ const CATEGORIES = [
 ];
 
 const TREND_CONFIG = {
-  rising: { icon: TrendingUp, color: 'text-green-500', label: '上升' },
-  stable: { icon: Minus, color: 'text-yellow-500', label: '稳定' },
-  declining: { icon: TrendingDown, color: 'text-red-500', label: '下降' },
+  rising: { icon: TrendingUp, color: 'text-success', label: '上升' },
+  stable: { icon: Minus, color: 'text-warning', label: '稳定' },
+  declining: { icon: TrendingDown, color: 'text-destructive', label: '下降' },
 };
 
 function HeatBar({ heat }: { heat: number }) {
