@@ -249,7 +249,7 @@ export default function Records() {
       {records.length > 0 && (
         <div className="flex items-center gap-3 flex-wrap">
           <Button variant="outline" size="sm" onClick={selectAll}>{selectedIds.size === filteredRecords.length ? '取消全选' : '全选'}</Button>
-          <Button size="sm" disabled={selectedIds.size < 2 || reviewing} onClick={handleReview} className="gap-1.5" style={selectedIds.size >= 2 ? { backgroundImage: 'var(--gradient-accent)' } : undefined}>
+          <Button size="sm" disabled={selectedIds.size < 2 || reviewing} onClick={handleReview} className={`gap-1.5 rounded-xl ${selectedIds.size >= 2 ? 'btn-accent-glow text-accent-foreground' : ''}`}>
             {reviewing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
             AI 复盘分析 {selectedIds.size > 0 && `(${selectedIds.size})`}
           </Button>
