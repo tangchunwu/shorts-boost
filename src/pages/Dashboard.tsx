@@ -168,7 +168,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Button onClick={() => navigate('/analyze')} className="h-auto py-5 justify-start gap-3 card-hover">
+        <Button onClick={() => navigate('/analyze')} className="h-auto py-5 justify-start gap-3">
           <div className="rounded-lg bg-primary-foreground/20 p-2"><Search className="h-5 w-5" /></div>
           <div className="text-left">
             <div className="font-semibold">新建 SEO 分析</div>
