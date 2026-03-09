@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import AnimatedOutlet from '@/components/AnimatedOutlet';
 import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut, Eye, X, Flame, Users } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { downloadBackup, restoreFromBackup } from '@/lib/storage';
