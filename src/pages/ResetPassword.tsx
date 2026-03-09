@@ -60,7 +60,7 @@ export default function ResetPassword() {
                 <Input id="confirm-password" type="password" placeholder="再次输入密码" value={confirm} onChange={e => setConfirm(e.target.value)} className="pl-9" required minLength={6} />
               </div>
             </div>
-            <Button type="submit" disabled={loading} className="w-full btn-primary-glow text-primary-foreground rounded-xl">
+            <Button type="submit" disabled={loading} className="w-full">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '重置密码'}
             </Button>
           </form>

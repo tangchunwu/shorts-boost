@@ -44,7 +44,7 @@ export default function GuestPromptDialog({ open, onOpenChange, featureName = '�
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>继续浏览</AlertDialogCancel>
-          <AlertDialogAction onClick={handleRegister} className="btn-primary-glow text-primary-foreground">
+          <AlertDialogAction onClick={handleRegister}>
             免费注册
           </AlertDialogAction>
         </AlertDialogFooter>

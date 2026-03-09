@@ -224,7 +224,7 @@ export default function Analyze() {
                 <Label htmlFor="seo-script">脚本内容（可选）</Label>
                 <Textarea id="seo-script" placeholder="粘贴视频脚本或描述内容..." value={script} onChange={e => setScript(e.target.value)} rows={4} />
               </div>
-              <Button onClick={handleAnalyze} disabled={loading} className="w-full sm:w-auto btn-primary-glow text-primary-foreground rounded-xl">
+              <Button onClick={handleAnalyze} disabled={loading} className="w-full sm:w-auto">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 {loading ? 'AI 分析中...' : '开始分析'}
               </Button>

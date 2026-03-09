@@ -130,7 +130,7 @@ export default function TrendingTopics() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={handleFetch} disabled={loading} className="btn-primary-glow text-primary-foreground rounded-xl">
+            <Button onClick={handleFetch} disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Flame className="h-4 w-4 mr-1" />}
               {loading ? '分析中...' : '获取热门话题'}
             </Button>

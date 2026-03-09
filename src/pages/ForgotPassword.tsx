@@ -50,7 +50,7 @@ export default function ForgotPassword() {
                   <Input id="reset-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-9" required />
                 </div>
               </div>
-              <Button type="submit" disabled={loading} className="w-full btn-primary-glow text-primary-foreground rounded-xl">
+              <Button type="submit" disabled={loading} className="w-full">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '发送重置链接'}
               </Button>
               <div className="text-center">
