@@ -258,7 +258,7 @@ export default function Dashboard() {
                     <Pie data={pieData} dataKey="views" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={40} paddingAngle={3} strokeWidth={0} animationBegin={0} animationDuration={800}>
                       {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
                     </Pie>
-                    <ChartTooltip />
+                    <Tooltip content={<ChartTooltip />} cursor={false} />
                     <Legend iconType="circle" iconSize={8} />
                   </PieChart>
                 </ResponsiveContainer>
@@ -274,7 +274,7 @@ export default function Dashboard() {
                     <Pie data={pieData} dataKey="likes" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={40} paddingAngle={3} strokeWidth={0} animationBegin={200} animationDuration={800}>
                       {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
                     </Pie>
-                    <ChartTooltip />
+                    <Tooltip content={<ChartTooltip />} cursor={false} />
                     <Legend iconType="circle" iconSize={8} />
                   </PieChart>
                 </ResponsiveContainer>
@@ -303,7 +303,7 @@ export default function Dashboard() {
                   </defs>
                   <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground) / 0.3)" axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground) / 0.3)" axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
-                  <ChartTooltip />
+                  <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'hsl(var(--muted-foreground) / 0.15)' }} />
                   <Area type="monotone" dataKey="views" name="播放量" stroke="hsl(var(--foreground))" fill="url(#viewsGrad)" strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2, fill: 'hsl(var(--card))' }} animationDuration={1000} />
                   <Area type="monotone" dataKey="likes" name="点赞数" stroke="hsl(var(--success))" fill="url(#likesGrad)" strokeWidth={1.5} dot={false} activeDot={{ r: 3, strokeWidth: 2, fill: 'hsl(var(--card))' }} animationDuration={1200} />
                 </AreaChart>
