@@ -8,6 +8,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, 
 import EmptyState from '@/components/EmptyState';
 import CompetitorCompare from '@/components/CompetitorCompare';
 import AIInsightsCard, { type Insight } from '@/components/AIInsightsCard';
+import PeriodicReportCard from '@/components/PeriodicReportCard';
 import { useRecords } from '@/hooks/useCloudData';
 import { exportDashboardPDF } from '@/lib/exportPDF';
 import { toast } from 'sonner';
@@ -328,6 +329,8 @@ export default function Dashboard() {
       {allRecords.length > 0 && <AIInsightsCard records={allRecords} onInsightsChange={setAiInsights} />}
 
       <CompetitorCompare />
+
+      {allRecords.length > 0 && <PeriodicReportCard records={allRecords} />}
 
       {allRecords.length === 0 && (
         <Card className="animate-fade-in-up">
