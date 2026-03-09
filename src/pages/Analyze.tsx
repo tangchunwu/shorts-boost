@@ -20,6 +20,7 @@ import EmptyState from '@/components/EmptyState';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
 import { useGuest } from '@/contexts/GuestContext';
 import TitleScoreCard from '@/components/TitleScoreCard';
+import TitleTemplates from '@/components/TitleTemplates';
 import ComplianceCheckCard from '@/components/ComplianceCheckCard';
 
 function AddToCalendarButton({ title, platform }: { title: string; platform: Platform }) {
