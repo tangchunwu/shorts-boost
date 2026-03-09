@@ -23,7 +23,7 @@
     --secondary-foreground: 0 0% 20%;
 
     --muted: 240 5% 92%;
-    --muted-foreground: 0 0% 44%;       /* gray-500 equivalent */
+    --muted-foreground: 0 0% 33%;       /* darker for better contrast */
 
     --accent: 240 4% 88%;
     --accent-foreground: 0 0% 11%;
@@ -81,7 +81,7 @@
     --secondary-foreground: 0 0% 85%;
 
     --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 55%;
+    --muted-foreground: 0 0% 65%;
 
     --accent: 0 0% 18%;
     --accent-foreground: 0 0% 92%;
