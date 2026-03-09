@@ -221,6 +221,8 @@ export default function Dashboard() {
         ))}
       </div>
 
+      <GoalCard records={allRecords} />
+
       {records.length > 0 && (
         <Card className="animate-fade-in-up animate-stagger-5">
           <CardHeader className="pb-2">
