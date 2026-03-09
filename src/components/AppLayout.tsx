@@ -180,6 +180,7 @@ export default function AppLayout() {
           <Outlet />
         </div>
       </main>
+      </div>
     </div>
   );
 }
