@@ -12,13 +12,15 @@ import { Calendar } from '@/components/ui/calendar';
 import { Platform, PLATFORM_LABELS, SEOSuggestion, AnalysisHistory, CalendarEvent } from '@/lib/types';
 import { useAnalyses, useSaveAnalysis, useSaveCalendarEvent } from '@/hooks/useCloudData';
 import { supabase } from '@/integrations/supabase/client';
-import { Copy, Check, Loader2, Sparkles, Clock, Hash, Lightbulb, History, Eye, ChevronDown, ChevronUp, Search, CalendarPlus } from 'lucide-react';
+import { Copy, Check, Loader2, Sparkles, Clock, Hash, Lightbulb, History, Eye, ChevronDown, ChevronUp, Search, CalendarPlus, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import EmptyState from '@/components/EmptyState';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
 import { useGuest } from '@/contexts/GuestContext';
+import TitleScoreCard from '@/components/TitleScoreCard';
+import TitleTemplates from '@/components/TitleTemplates';
 
 function AddToCalendarButton({ title, platform }: { title: string; platform: Platform }) {
   const [date, setDate] = useState<Date>();
@@ -139,7 +141,7 @@ export default function Analyze() {
       });
       if (error) throw new Error(error.message || '分析失败');
       if (data?.error) { toast.error(data.error); setLoading(false); return; }
-      const seoResult: SEOSuggestion = { titles: data.titles || [], keywords: data.keywords || [], tips: data.tips || [], bestPostTime: data.bestPostTime || '' };
+      const seoResult: SEOSuggestion = { titles: data.titles || [], keywords: data.keywords || [], tips: data.tips || [], bestPostTime: data.bestPostTime || '', titleScore: data.titleScore || undefined };
       setResult(seoResult);
       const history: AnalysisHistory = { id: crypto.randomUUID(), inputTitle: title, inputScript: script, platform, suggestions: seoResult, createdAt: new Date().toISOString().slice(0, 10) };
       saveAnalysis.mutate(history);
@@ -187,6 +189,7 @@ export default function Analyze() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="analyze" className="gap-1.5"><Sparkles className="h-3.5 w-3.5" /> 新建分析</TabsTrigger>
+          <TabsTrigger value="templates" className="gap-1.5"><Wand2 className="h-3.5 w-3.5" /> 标题灵感</TabsTrigger>
           <TabsTrigger value="history" className="gap-1.5"><History className="h-3.5 w-3.5" /> 历史记录 ({histories.length})</TabsTrigger>
         </TabsList>
 
@@ -213,7 +216,12 @@ export default function Analyze() {
               </Button>
             </CardContent>
           </Card>
+          {result?.titleScore && <TitleScoreCard score={result.titleScore} className="card-hover animate-fade-in-up animate-stagger-1" />}
           {result && <ResultDisplay result={result} platform={platform} copied={copied} copyText={copyText} stagger />}
+        </TabsContent>
+
+        <TabsContent value="templates" className="mt-4">
+          <TitleTemplates platform={platform} onApply={(t) => { setTitle(t); setActiveTab('analyze'); }} />
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4 mt-4">
