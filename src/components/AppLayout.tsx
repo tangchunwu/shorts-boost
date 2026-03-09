@@ -147,8 +147,20 @@ export default function AppLayout() {
       </aside>
 
       {/* Mobile nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-sm px-2 py-1.5">
-        <nav className="flex justify-around">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-sm">
+        {/* Guest indicator bar */}
+        {isGuest && (
+          <div className="flex items-center justify-between px-3 py-1.5 bg-accent/10 border-b border-accent/20">
+            <div className="flex items-center gap-1.5 text-xs">
+              <Eye className="h-3 w-3 text-accent" />
+              <span className="text-accent font-medium">访客模式</span>
+            </div>
+            <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2 gap-1 text-accent hover:text-accent" onClick={handleExitGuest}>
+              <X className="h-3 w-3" /> 退出
+            </Button>
+          </div>
+        )}
+        <nav className="flex justify-around px-2 py-1.5">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
