@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -117,6 +118,7 @@ function ResultDisplay({ result, platform, copied, copyText, stagger = false }: 
 }
 
 export default function Analyze() {
+  const location = useLocation();
   const [title, setTitle] = useState('');
   const [script, setScript] = useState('');
   const [platform, setPlatform] = useState<Platform>('douyin');
@@ -130,6 +132,17 @@ export default function Analyze() {
   const [activeTab, setActiveTab] = useState('analyze');
   const { isGuest } = useGuest();
   const [showGuestPrompt, setShowGuestPrompt] = useState(false);
+
+  // Receive topic from trending page
+  useEffect(() => {
+    const state = location.state as { title?: string; keywords?: string[] } | null;
+    if (state?.title) {
+      setTitle(state.title);
+      setActiveTab('analyze');
+      // Clear the state to prevent re-applying on re-render
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleAnalyze = async () => {
     if (isGuest) { setShowGuestPrompt(true); return; }
