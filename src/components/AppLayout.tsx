@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import AnimatedOutlet from '@/components/AnimatedOutlet';
+import GlobalSearch from '@/components/GlobalSearch';
 import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut, Eye, X, Flame, Users } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
@@ -86,6 +87,7 @@ export default function AppLayout() {
 
   return (
     <div className="flex min-h-screen bg-background flex-col">
+      <GlobalSearch />
       {/* Mobile top header */}
       <div className="md:hidden flex items-center justify-between px-5 py-3.5 glass-strong">
         <h1 className="text-sm font-extrabold tracking-tight text-foreground">
