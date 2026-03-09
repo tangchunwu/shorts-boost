@@ -11,6 +11,7 @@ import { useRecords } from '@/hooks/useCloudData';
 import { useCompetitorVideos, useSaveCompetitorVideo, useDeleteCompetitorVideo } from '@/hooks/useCompetitorData';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, Plus, Trash2, BarChart3, Eye, ThumbsUp, MessageSquare, Share2, Loader2, Sparkles, TrendingUp } from 'lucide-react';
+import AIProgressBar from '@/components/AIProgressBar';
 import { toast } from 'sonner';
 import EmptyState from '@/components/EmptyState';
 import PageSkeleton from '@/components/PageSkeleton';
