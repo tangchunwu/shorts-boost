@@ -14,7 +14,8 @@ import { exportToCSV, parseCSV } from '@/lib/csv';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star, Download, Upload, FileText, Search, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
+import ChartTooltip from '@/components/ChartTooltip';
 import { useRef } from 'react';
 import EmptyState from '@/components/EmptyState';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
@@ -93,6 +94,7 @@ export default function Records() {
 
   const handleSubmit = () => {
     if (!form.title.trim()) { toast.error('请输入标题'); return; }
+    if (form.title.trim().length < 2) { toast.error('标题至少需要 2 个字符'); return; }
     const views = parseInt(form.views) || 0;
     const likes = parseInt(form.likes) || 0;
     const comments = parseInt(form.comments) || 0;
@@ -101,6 +103,7 @@ export default function Records() {
       toast.error('数据不能为负数');
       return;
     }
+    if (!form.publishedAt) { toast.error('请选择发布日期'); return; }
     const record: PublishRecord = {
       id: crypto.randomUUID(),
       title: form.title,
