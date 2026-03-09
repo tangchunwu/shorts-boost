@@ -10,6 +10,7 @@ import ChartTooltip from '@/components/ChartTooltip';
 import EmptyState from '@/components/EmptyState';
 import CompetitorCompare from '@/components/CompetitorCompare';
 import AIInsightsCard, { type Insight } from '@/components/AIInsightsCard';
+import GoalCard from '@/components/GoalCard';
 import PeriodicReportCard from '@/components/PeriodicReportCard';
 import { useRecords } from '@/hooks/useCloudData';
 import { exportDashboardPDF } from '@/lib/exportPDF';
