@@ -11,6 +11,18 @@ import AIInsightsCard, { type Insight } from '@/components/AIInsightsCard';
 import { useRecords } from '@/hooks/useCloudData';
 import { exportDashboardPDF } from '@/lib/exportPDF';
 import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/contexts/AuthContext';
+import { useGuest } from '@/contexts/GuestContext';
+
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 6) return '夜深了 🌙';
+  if (h < 12) return '早上好 ☀️';
+  if (h < 14) return '中午好 🌤';
+  if (h < 18) return '下午好 ☕';
+  return '晚上好 🌆';
+}
 
 const ALL_PLATFORMS: ('all' | Platform)[] = ['all', 'douyin', 'kuaishou', 'xiaohongshu', 'bilibili'];
 
@@ -31,6 +43,8 @@ function getDateThreshold(range: TimeRange): string | null {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { data: allRecords = [], isLoading } = useRecords();
+  const { user } = useAuth();
+  const { isGuest } = useGuest();
   const [platformFilter, setPlatformFilter] = useState<'all' | Platform>('all');
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
   const [aiInsights, setAiInsights] = useState<Insight[]>([]);
@@ -122,14 +136,25 @@ export default function Dashboard() {
   const PIE_COLORS = pieData.map(d => PLATFORM_COLORS[d.platform]);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[1,2,3,4].map(i => <Skeleton key={i} className="h-24 rounded-xl" />)}
+        </div>
+        <Skeleton className="h-48 rounded-xl" />
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6 page-enter">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">仪表盘</h1>
+          <h1 className="text-2xl font-bold">{getGreeting()}{isGuest ? '，访客' : user?.email ? `，${user.email.split('@')[0]}` : ''}</h1>
           <p className="text-muted-foreground text-sm mt-1">短视频数据概览与快速操作</p>
         </div>
         {allRecords.length > 0 && (
