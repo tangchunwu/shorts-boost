@@ -7,17 +7,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Platform, PLATFORM_LABELS, PLATFORM_COLORS, PublishRecord } from '@/lib/types';
 import { useRecords, useSaveRecord, useDeleteRecord } from '@/hooks/useCloudData';
 import { exportToCSV, parseCSV } from '@/lib/csv';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star, Download, Upload, FileText } from 'lucide-react';
+import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star, Download, Upload, FileText, Search, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
 import { useRef } from 'react';
 import EmptyState from '@/components/EmptyState';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
 import { useGuest } from '@/contexts/GuestContext';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ReviewResult {
   summary: string;
@@ -26,6 +28,8 @@ interface ReviewResult {
   actionItems: string[];
   bestTitle: string;
 }
+
+type SortKey = 'date' | 'views' | 'likes';
 
 export default function Records() {
   const { data: records = [], isLoading } = useRecords();
@@ -38,10 +42,29 @@ export default function Records() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isGuest } = useGuest();
   const [showGuestPrompt, setShowGuestPrompt] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [platformFilter, setPlatformFilter] = useState<'all' | Platform>('all');
+  const [sortKey, setSortKey] = useState<SortKey>('date');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: '', platform: 'douyin' as Platform, publishedAt: new Date().toISOString().slice(0, 10),
     views: '', likes: '', comments: '', shares: '', tags: '',
   });
+
+  const filteredRecords = useMemo(() => {
+    let result = records;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(r => r.title.toLowerCase().includes(q) || r.tags.some(t => t.toLowerCase().includes(q)));
+    }
+    if (platformFilter !== 'all') result = result.filter(r => r.platform === platformFilter);
+    result = [...result].sort((a, b) => {
+      if (sortKey === 'views') return b.views - a.views;
+      if (sortKey === 'likes') return b.likes - a.likes;
+      return b.publishedAt.localeCompare(a.publishedAt);
+    });
+    return result;
+  }, [records, searchQuery, platformFilter, sortKey]);
 
   const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,15 +93,20 @@ export default function Records() {
 
   const handleSubmit = () => {
     if (!form.title.trim()) { toast.error('请输入标题'); return; }
+    const views = parseInt(form.views) || 0;
+    const likes = parseInt(form.likes) || 0;
+    const comments = parseInt(form.comments) || 0;
+    const shares = parseInt(form.shares) || 0;
+    if (views < 0 || likes < 0 || comments < 0 || shares < 0) {
+      toast.error('数据不能为负数');
+      return;
+    }
     const record: PublishRecord = {
       id: crypto.randomUUID(),
       title: form.title,
       platform: form.platform,
       publishedAt: form.publishedAt,
-      views: parseInt(form.views) || 0,
-      likes: parseInt(form.likes) || 0,
-      comments: parseInt(form.comments) || 0,
-      shares: parseInt(form.shares) || 0,
+      views, likes, comments, shares,
       tags: form.tags.split(/[,，\s]+/).filter(Boolean),
       performance: 'normal',
       createdAt: new Date().toISOString(),
@@ -92,10 +120,12 @@ export default function Records() {
     });
   };
 
-  const handleDelete = (id: string) => {
-    deleteRecordMutation.mutate(id, {
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteRecordMutation.mutate(deleteTarget, {
       onSuccess: () => {
-        setSelectedIds(prev => { const n = new Set(prev); n.delete(id); return n; });
+        setSelectedIds(prev => { const n = new Set(prev); n.delete(deleteTarget); return n; });
+        setDeleteTarget(null);
         toast.success('已删除');
       },
     });
@@ -111,7 +141,7 @@ export default function Records() {
   };
 
   const selectAll = () => {
-    setSelectedIds(selectedIds.size === records.length ? new Set() : new Set(records.map(r => r.id)));
+    setSelectedIds(selectedIds.size === filteredRecords.length ? new Set() : new Set(filteredRecords.map(r => r.id)));
   };
 
   const handleReview = async () => {
@@ -134,7 +164,15 @@ export default function Records() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2"><Skeleton className="h-8 w-36" /><Skeleton className="h-4 w-52" /></div>
+          <Skeleton className="h-10 w-28" />
+        </div>
+        <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-28 rounded-xl" />)}</div>
+      </div>
+    );
   }
 
   return (
@@ -163,12 +201,12 @@ export default function Records() {
                   <div className="space-y-2"><Label htmlFor="rec-date">发布日期</Label><Input id="rec-date" type="date" value={form.publishedAt} onChange={e => setForm(f => ({ ...f, publishedAt: e.target.value }))} /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2"><Label>播放量</Label><Input placeholder="0" type="number" value={form.views} onChange={e => setForm(f => ({ ...f, views: e.target.value }))} /></div>
-                  <div className="space-y-2"><Label>点赞数</Label><Input placeholder="0" type="number" value={form.likes} onChange={e => setForm(f => ({ ...f, likes: e.target.value }))} /></div>
+                  <div className="space-y-2"><Label>播放量</Label><Input placeholder="0" type="number" min="0" value={form.views} onChange={e => setForm(f => ({ ...f, views: e.target.value }))} /></div>
+                  <div className="space-y-2"><Label>点赞数</Label><Input placeholder="0" type="number" min="0" value={form.likes} onChange={e => setForm(f => ({ ...f, likes: e.target.value }))} /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2"><Label>评论数</Label><Input placeholder="0" type="number" value={form.comments} onChange={e => setForm(f => ({ ...f, comments: e.target.value }))} /></div>
-                  <div className="space-y-2"><Label>分享数</Label><Input placeholder="0" type="number" value={form.shares} onChange={e => setForm(f => ({ ...f, shares: e.target.value }))} /></div>
+                  <div className="space-y-2"><Label>评论数</Label><Input placeholder="0" type="number" min="0" value={form.comments} onChange={e => setForm(f => ({ ...f, comments: e.target.value }))} /></div>
+                  <div className="space-y-2"><Label>分享数</Label><Input placeholder="0" type="number" min="0" value={form.shares} onChange={e => setForm(f => ({ ...f, shares: e.target.value }))} /></div>
                 </div>
                 <div className="space-y-2"><Label>标签（逗号分隔）</Label><Input placeholder="美食, 日常, vlog" value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} /></div>
                 <Button onClick={handleSubmit} className="w-full" disabled={saveRecordMutation.isPending}>保存</Button>
@@ -178,14 +216,45 @@ export default function Records() {
         </div>
       </div>
 
+      {/* Search, filter, sort */}
+      {records.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-3 animate-fade-in">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="搜索标题或标签..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9" />
+          </div>
+          <div className="flex gap-2">
+            <Select value={platformFilter} onValueChange={v => setPlatformFilter(v as 'all' | Platform)}>
+              <SelectTrigger className="w-[120px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部平台</SelectItem>
+                {Object.entries(PLATFORM_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={sortKey} onValueChange={v => setSortKey(v as SortKey)}>
+              <SelectTrigger className="w-[120px]">
+                <ArrowUpDown className="h-3.5 w-3.5 mr-1.5" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">按日期</SelectItem>
+                <SelectItem value="views">按播放量</SelectItem>
+                <SelectItem value="likes">按点赞数</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
       {records.length > 0 && (
         <div className="flex items-center gap-3 flex-wrap">
-          <Button variant="outline" size="sm" onClick={selectAll}>{selectedIds.size === records.length ? '取消全选' : '全选'}</Button>
+          <Button variant="outline" size="sm" onClick={selectAll}>{selectedIds.size === filteredRecords.length ? '取消全选' : '全选'}</Button>
           <Button size="sm" disabled={selectedIds.size < 2 || reviewing} onClick={handleReview} className="gap-1.5" style={selectedIds.size >= 2 ? { backgroundImage: 'var(--gradient-accent)' } : undefined}>
             {reviewing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
             AI 复盘分析 {selectedIds.size > 0 && `(${selectedIds.size})`}
           </Button>
           {selectedIds.size > 0 && selectedIds.size < 2 && <span className="text-xs text-muted-foreground">至少选择 2 条记录</span>}
+          {searchQuery && <span className="text-xs text-muted-foreground">找到 {filteredRecords.length} 条结果</span>}
         </div>
       )}
 
@@ -310,7 +379,7 @@ export default function Records() {
       )}
 
       <div className="space-y-3">
-        {records.map((r, i) => (
+        {filteredRecords.map((r, i) => (
           <Card key={r.id} className={`card-hover animate-fade-in-up animate-stagger-${Math.min(i + 1, 5)} ${selectedIds.has(r.id) ? 'ring-2 ring-primary/40' : ''} ${r.performance === 'high' ? 'ring-1 ring-success/30' : r.performance === 'low' ? 'ring-1 ring-destructive/30' : ''}`}>
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
@@ -335,7 +404,7 @@ export default function Records() {
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => togglePerformance(r)}>
                     {r.performance === 'high' ? <TrendingDown className="h-3.5 w-3.5" /> : <TrendingUp className="h-3.5 w-3.5" />}
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(r.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteTarget(r.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
               </div>
             </CardContent>
@@ -343,10 +412,31 @@ export default function Records() {
         ))}
       </div>
 
+      {filteredRecords.length === 0 && records.length > 0 && (
+        <div className="text-center py-12 text-muted-foreground">
+          <Search className="h-8 w-8 mx-auto mb-3 opacity-40" />
+          <p className="text-sm">没有找到匹配的记录</p>
+        </div>
+      )}
+
       {records.length === 0 && (
         <EmptyState icon={FileText} title="还没有发布记录" description="点击「添加记录」开始追踪你的短视频数据 📊" actionLabel="添加记录" onAction={() => setOpen(true)} />
       )}
+
       <GuestPromptDialog open={showGuestPrompt} onOpenChange={setShowGuestPrompt} featureName="AI 复盘" />
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={open => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>删除后无法恢复，确定要删除这条发布记录吗？</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
