@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useGuest } from '@/contexts/GuestContext';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
 
-function ConvertToRecordDialog({ event, onDone }: { event: CalendarEvent; onDone: () => void }) {
+function ConvertToRecordDialog({ event, onDone, onGuestBlock }: { event: CalendarEvent; onDone: () => void; onGuestBlock?: () => void }) {
   const [open, setOpen] = useState(false);
   const [views, setViews] = useState('0');
   const [likes, setLikes] = useState('0');
@@ -24,17 +24,31 @@ function ConvertToRecordDialog({ event, onDone }: { event: CalendarEvent; onDone
   const [shares, setShares] = useState('0');
   const saveRecord = useSaveRecord();
   const saveEvent = useSaveCalendarEvent();
+  const { isGuest } = useGuest();
+
+  const handleOpen = (isOpen: boolean) => {
+    if (isOpen && isGuest) {
+      onGuestBlock?.();
+      return;
+    }
+    setOpen(isOpen);
+  };
 
   const handleConvert = () => {
+    const viewsNum = parseInt(views) || 0;
+    const likesNum = parseInt(likes) || 0;
+    const commentsNum = parseInt(comments) || 0;
+    const sharesNum = parseInt(shares) || 0;
+    if (viewsNum < 0 || likesNum < 0 || commentsNum < 0 || sharesNum < 0) {
+      toast.error('数据不能为负数');
+      return;
+    }
     const record: PublishRecord = {
       id: crypto.randomUUID(),
       title: event.title,
       platform: event.platform,
       publishedAt: event.date,
-      views: parseInt(views) || 0,
-      likes: parseInt(likes) || 0,
-      comments: parseInt(comments) || 0,
-      shares: parseInt(shares) || 0,
+      views: viewsNum, likes: likesNum, comments: commentsNum, shares: sharesNum,
       tags: [],
       performance: 'normal',
       createdAt: new Date().toISOString(),
@@ -53,7 +67,7 @@ function ConvertToRecordDialog({ event, onDone }: { event: CalendarEvent; onDone
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" className="h-7 w-7" title="转为发布记录">
           <ArrowRightCircle className="h-3.5 w-3.5 text-primary" />
