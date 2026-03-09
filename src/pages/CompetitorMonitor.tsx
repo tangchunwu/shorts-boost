@@ -121,7 +121,7 @@ export default function CompetitorMonitor() {
           <h1 className="text-2xl font-bold">竞品监控</h1>
           <p className="text-muted-foreground text-sm mt-1">记录竞品视频数据，对比分析差距</p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)} size="sm" style={{ backgroundImage: 'var(--gradient-primary)' }}>
+        <Button onClick={() => setShowForm(!showForm)} size="sm" className="btn-primary-glow text-primary-foreground rounded-xl">
           <Plus className="h-4 w-4 mr-1" /> 添加竞品视频
         </Button>
       </div>
