@@ -140,7 +140,7 @@ export default function CompetitorCompare() {
           )}
         </div>
 
-        <Button onClick={handleCompare} disabled={loading} className="w-full sm:w-auto" style={{ backgroundImage: 'var(--gradient-primary)' }}>
+        <Button onClick={handleCompare} disabled={loading} className="w-full sm:w-auto btn-primary-glow text-primary-foreground rounded-xl">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Swords className="h-4 w-4" />}
           {loading ? 'AI 分析中...' : '开始对比'}
         </Button>

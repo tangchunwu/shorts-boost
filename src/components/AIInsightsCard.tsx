@@ -94,8 +94,7 @@ export default function AIInsightsCard({ records, onInsightsChange }: Props) {
               onClick={fetchInsights}
               disabled={records.length === 0}
               size="sm"
-              className="gap-2"
-              style={{ backgroundImage: 'var(--gradient-primary)' }}
+              className="gap-2 btn-primary-glow text-primary-foreground rounded-xl"
             >
               <Sparkles className="h-3.5 w-3.5" />
               开始分析

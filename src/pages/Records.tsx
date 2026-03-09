@@ -190,7 +190,7 @@ export default function Records() {
           )}
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button style={{ backgroundImage: 'var(--gradient-primary)' }}><Plus className="h-4 w-4 mr-1" /> 添加记录</Button>
+              <Button className="btn-primary-glow text-primary-foreground rounded-xl"><Plus className="h-4 w-4 mr-1" /> 添加记录</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>添加发布记录</DialogTitle></DialogHeader>

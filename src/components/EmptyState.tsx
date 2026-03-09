@@ -18,7 +18,7 @@ export default function EmptyState({ icon: Icon, title, description, actionLabel
       <h3 className="text-lg font-semibold mb-1.5">{title}</h3>
       <p className="text-sm text-muted-foreground text-center max-w-xs mb-5">{description}</p>
       {actionLabel && onAction && (
-        <Button onClick={onAction} style={{ backgroundImage: 'var(--gradient-primary)' }}>
+        <Button onClick={onAction} className="btn-primary-glow text-primary-foreground rounded-xl">
           {actionLabel}
         </Button>
       )}
