@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
 import { useRef } from 'react';
 import EmptyState from '@/components/EmptyState';
+import GuestPromptDialog from '@/components/GuestPromptDialog';
+import { useGuest } from '@/contexts/GuestContext';
 
 interface ReviewResult {
   summary: string;
@@ -34,6 +36,8 @@ export default function Records() {
   const [reviewing, setReviewing] = useState(false);
   const [reviewResult, setReviewResult] = useState<ReviewResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isGuest } = useGuest();
+  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
   const [form, setForm] = useState({
     title: '', platform: 'douyin' as Platform, publishedAt: new Date().toISOString().slice(0, 10),
     views: '', likes: '', comments: '', shares: '', tags: '',
@@ -111,6 +115,7 @@ export default function Records() {
   };
 
   const handleReview = async () => {
+    if (isGuest) { setShowGuestPrompt(true); return; }
     if (selectedIds.size < 2) { toast.error('请至少选择 2 条记录进行复盘'); return; }
     setReviewing(true);
     setReviewResult(null);
@@ -341,6 +346,7 @@ export default function Records() {
       {records.length === 0 && (
         <EmptyState icon={FileText} title="还没有发布记录" description="点击「添加记录」开始追踪你的短视频数据 📊" actionLabel="添加记录" onAction={() => setOpen(true)} />
       )}
+      <GuestPromptDialog open={showGuestPrompt} onOpenChange={setShowGuestPrompt} featureName="AI 复盘" />
     </div>
   );
 }

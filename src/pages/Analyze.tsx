@@ -283,6 +283,7 @@ export default function Analyze() {
           )}
         </TabsContent>
       </Tabs>
+      <GuestPromptDialog open={showGuestPrompt} onOpenChange={setShowGuestPrompt} featureName="AI 分析" />
     </div>
   );
 }
