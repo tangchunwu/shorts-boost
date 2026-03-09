@@ -54,8 +54,32 @@ export default function AppLayout() {
     toast.success('已退出登录');
   };
 
+  const handleExitGuest = () => {
+    exitGuestMode();
+    navigate('/auth');
+  };
+
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background flex-col">
+      {/* Guest banner */}
+      {isGuest && (
+        <div className="bg-accent/10 border-b border-accent/20 px-4 py-2 flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2 text-sm">
+            <Eye className="h-4 w-4 text-accent" />
+            <span className="text-accent font-medium">访客模式</span>
+            <span className="text-muted-foreground text-xs hidden sm:inline">— 你正在使用示例数据，所有操作不会被保存</span>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={handleExitGuest}>
+              <X className="h-3 w-3" /> 退出访客
+            </Button>
+            <Button size="sm" className="h-7 text-xs" onClick={handleExitGuest} style={{ backgroundImage: 'var(--gradient-primary)' }}>
+              注册 / 登录
+            </Button>
+          </div>
+        </div>
+      )}
+      <div className="flex flex-1 min-h-0">
       {/* Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r border-border bg-card p-5">
         <div className="mb-2 px-2">
@@ -105,7 +129,11 @@ export default function AppLayout() {
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             {dark ? '浅色模式' : '深色模式'}
           </Button>
-          {user && (
+          {isGuest ? (
+            <Button variant="ghost" size="sm" onClick={handleExitGuest} className="w-full justify-start gap-2 text-muted-foreground hover:text-primary">
+              <LogOut className="h-4 w-4" /> 退出访客模式
+            </Button>
+          ) : user && (
             <>
               <div className="px-2 py-1.5">
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
