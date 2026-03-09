@@ -90,21 +90,21 @@ export default function Auth() {
       </div>
 
       {/* Right: Auth form */}
-      <div className="flex-1 flex items-center justify-center p-6 relative z-10">
+      <div className="flex-1 flex items-center justify-center px-5 py-8 sm:p-6 relative z-10">
         <div className="w-full max-w-[420px] animate-fade-in">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex flex-col items-center mb-8">
-            <div className="w-28 h-28 rounded-[28px] flex items-center justify-center bg-card mb-4" style={{ boxShadow: 'var(--shadow-float)' }}>
-              <img src={logoImg} alt="短视频增长助手" className="w-16 h-16" />
+          {/* Mobile logo - compact */}
+          <div className="lg:hidden flex flex-col items-center mb-6">
+            <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-[20px] sm:rounded-[28px] flex items-center justify-center bg-card mb-3" style={{ boxShadow: 'var(--shadow-float)' }}>
+              <img src={logoImg} alt="短视频增长助手" className="w-12 h-12 sm:w-16 sm:h-16" />
             </div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">
               短视频增长助手
             </h1>
-            <p className="text-muted-foreground text-sm mt-1.5">优化标题 · 提升流量 · 数据驱动</p>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">优化标题 · 提升流量 · 数据驱动</p>
           </div>
 
           {/* Form card */}
-          <div className="zen-card p-8 rounded-[28px]">
+          <div className="zen-card p-6 sm:p-8 rounded-[24px] sm:rounded-[28px]">
             <div className="hidden lg:block mb-6">
               <h2 className="text-xl font-bold text-foreground">
                 {tab === 'login' ? '欢迎回来' : '创建账号'}
@@ -126,17 +126,17 @@ export default function Auth() {
                     <Label htmlFor="login-email" className="text-xs font-semibold text-muted-foreground">邮箱</Label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                      <Input id="login-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-11 h-12" required />
+                      <Input id="login-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-11 h-11 sm:h-12 text-sm" required />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="login-password" className="text-xs font-semibold text-muted-foreground">密码</Label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                      <Input id="login-password" type="password" placeholder="••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-11 h-12" required />
+                      <Input id="login-password" type="password" placeholder="••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-11 h-11 sm:h-12 text-sm" required />
                     </div>
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full h-12 text-base font-semibold">
+                  <Button type="submit" disabled={loading} className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold">
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '登录'}
                   </Button>
                   <div className="text-center pt-1">
@@ -153,31 +153,31 @@ export default function Auth() {
                     <Label htmlFor="signup-username" className="text-xs font-semibold text-muted-foreground">用户名</Label>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                      <Input id="signup-username" placeholder="你的昵称" value={username} onChange={e => setUsername(e.target.value)} className="pl-11 h-12" />
+                      <Input id="signup-username" placeholder="你的昵称" value={username} onChange={e => setUsername(e.target.value)} className="pl-11 h-11 sm:h-12 text-sm" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email" className="text-xs font-semibold text-muted-foreground">邮箱</Label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                      <Input id="signup-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-11 h-12" required />
+                      <Input id="signup-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-11 h-11 sm:h-12 text-sm" required />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password" className="text-xs font-semibold text-muted-foreground">密码</Label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                      <Input id="signup-password" type="password" placeholder="至少 6 个字符" value={password} onChange={e => setPassword(e.target.value)} className="pl-11 h-12" required minLength={6} />
+                      <Input id="signup-password" type="password" placeholder="至少 6 个字符" value={password} onChange={e => setPassword(e.target.value)} className="pl-11 h-11 sm:h-12 text-sm" required minLength={6} />
                     </div>
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full h-12 text-base font-semibold">
+                  <Button type="submit" disabled={loading} className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold">
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '注册'}
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
 
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border/50" />
@@ -188,7 +188,7 @@ export default function Auth() {
               </div>
               <Button
                 variant="outline"
-                className="w-full mt-5 gap-2 h-12"
+                className="w-full mt-4 sm:mt-5 gap-2 h-11 sm:h-12"
                 onClick={enterGuestMode}
               >
                 <Eye className="h-4 w-4" strokeWidth={1.5} />
