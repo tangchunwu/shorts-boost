@@ -21,6 +21,7 @@ import GuestPromptDialog from '@/components/GuestPromptDialog';
 import { useGuest } from '@/contexts/GuestContext';
 import TitleScoreCard from '@/components/TitleScoreCard';
 import TitleTemplates from '@/components/TitleTemplates';
+import ComplianceCheckCard from '@/components/ComplianceCheckCard';
 
 function AddToCalendarButton({ title, platform }: { title: string; platform: Platform }) {
   const [date, setDate] = useState<Date>();
@@ -217,6 +218,7 @@ export default function Analyze() {
             </CardContent>
           </Card>
           {result?.titleScore && <TitleScoreCard score={result.titleScore} className="card-hover animate-fade-in-up animate-stagger-1" />}
+          {result && <ComplianceCheckCard title={title} keywords={result.keywords} platform={platform} className="card-hover animate-fade-in-up animate-stagger-2" />}
           {result && <ResultDisplay result={result} platform={platform} copied={copied} copyText={copyText} stagger />}
         </TabsContent>
 
