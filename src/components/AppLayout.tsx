@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import AnimatedOutlet from '@/components/AnimatedOutlet';
 import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut, Eye, X, Flame, Users } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -203,7 +204,7 @@ export default function AppLayout() {
         {/* Main content */}
         <main className="flex-1 overflow-auto pb-24 md:pb-0">
           <div className="mx-auto max-w-5xl p-4 md:p-8">
-            <Outlet />
+            <AnimatedOutlet />
           </div>
         </main>
       </div>
