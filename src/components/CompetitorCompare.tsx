@@ -9,6 +9,8 @@ import { Platform, PLATFORM_LABELS } from '@/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Swords, Plus, X, Check, Copy, ThumbsUp, ThumbsDown, Sparkles, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
+import { useGuest } from '@/contexts/GuestContext';
+import GuestPromptDialog from '@/components/GuestPromptDialog';
 
 interface CompetitorScore {
   title: string;
@@ -50,6 +52,8 @@ export default function CompetitorCompare() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CompareResult | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const { isGuest } = useGuest();
+  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
 
   const addCompetitor = () => {
     if (competitors.length < 5) setCompetitors([...competitors, '']);
@@ -73,6 +77,7 @@ export default function CompetitorCompare() {
   };
 
   const handleCompare = async () => {
+    if (isGuest) { setShowGuestPrompt(true); return; }
     if (!myTitle.trim()) { toast.error('请输入你的标题'); return; }
     const validCompetitors = competitors.filter(c => c.trim());
     if (validCompetitors.length === 0) { toast.error('请至少输入一个竞品标题'); return; }
@@ -195,6 +200,7 @@ export default function CompetitorCompare() {
           </div>
         )}
       </CardContent>
+      <GuestPromptDialog open={showGuestPrompt} onOpenChange={setShowGuestPrompt} featureName="竞品对比" />
     </Card>
   );
 }

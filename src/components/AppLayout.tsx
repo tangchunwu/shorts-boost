@@ -61,6 +61,15 @@ export default function AppLayout() {
 
   return (
     <div className="flex min-h-screen bg-background flex-col">
+      {/* Mobile top header */}
+      <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-border bg-card">
+        <h1 className="text-base font-bold bg-clip-text text-transparent" style={{ backgroundImage: 'var(--gradient-primary)' }}>
+          📈 短视频增长助手
+        </h1>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDark(!dark)}>
+          {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
+      </div>
       {/* Guest banner */}
       {isGuest && (
         <div className="bg-accent/10 border-b border-accent/20 px-4 py-2 flex items-center justify-between gap-3 shrink-0">
