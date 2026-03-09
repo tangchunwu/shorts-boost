@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Users, Plus, Trash2, BarChart3, Eye, ThumbsUp, MessageSquare, Share2, Loader2, Sparkles, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import EmptyState from '@/components/EmptyState';
+import PageSkeleton from '@/components/PageSkeleton';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
 import CompetitorAnalysisReport, { type CompetitorReport } from '@/components/CompetitorAnalysisReport';
 import { useGuest } from '@/contexts/GuestContext';
@@ -36,7 +37,7 @@ export default function CompetitorMonitor() {
   const { data: myRecords = [] } = useRecords();
   const { isGuest } = useGuest();
 
-  const [showForm, setShowForm] = useState(false);
+  if (isLoading) return <PageSkeleton variant="list" />;
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [report, setReport] = useState<CompetitorReport | null>(null);
