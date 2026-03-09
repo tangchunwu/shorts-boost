@@ -10,6 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import Analyze from "./pages/Analyze";
 import Records from "./pages/Records";
 import ContentCalendar from "./pages/ContentCalendar";
+import TrendingTopics from "./pages/TrendingTopics";
+import CompetitorMonitor from "./pages/CompetitorMonitor";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -52,6 +54,8 @@ const AppRoutes = () => (
       <Route path="/analyze" element={<Analyze />} />
       <Route path="/records" element={<Records />} />
       <Route path="/calendar" element={<ContentCalendar />} />
+      <Route path="/trending" element={<TrendingTopics />} />
+      <Route path="/competitors" element={<CompetitorMonitor />} />
     </Route>
     <Route path="*" element={<NotFound />} />
   </Routes>
