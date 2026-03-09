@@ -10,12 +10,12 @@ import { useGuest } from '@/contexts/GuestContext';
 import { toast } from 'sonner';
 
 const navItems = [
-  { to: '/', icon: BarChart3, label: '仪表盘' },
-  { to: '/analyze', icon: Search, label: 'SEO 分析' },
-  { to: '/trending', icon: Flame, label: '热门话题' },
-  { to: '/records', icon: FileText, label: '发布记录' },
-  { to: '/calendar', icon: Calendar, label: '内容日历' },
-  { to: '/competitors', icon: Users, label: '竞品监控' },
+  { to: '/', icon: BarChart3, label: '仪表盘', tourId: 'tour-nav-dashboard' },
+  { to: '/analyze', icon: Search, label: 'SEO 分析', tourId: 'tour-nav-analyze' },
+  { to: '/trending', icon: Flame, label: '热门话题', tourId: 'tour-nav-trending' },
+  { to: '/records', icon: FileText, label: '发布记录', tourId: 'tour-nav-records' },
+  { to: '/calendar', icon: Calendar, label: '内容日历', tourId: 'tour-nav-calendar' },
+  { to: '/competitors', icon: Users, label: '竞品监控', tourId: 'tour-nav-competitors' },
 ];
 
 export default function AppLayout() {
@@ -133,11 +133,12 @@ export default function AppLayout() {
             </div>
             <Separator className="my-4 bg-border/50" />
             <nav className="flex-1 space-y-1">
-              {navItems.map(({ to, icon: Icon, label }) => (
+              {navItems.map(({ to, icon: Icon, label, tourId }) => (
                 <NavLink
                   key={to}
                   to={to}
                   end={to === '/'}
+                  id={tourId}
                   className={({ isActive }) =>
                     `relative flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-[0.97] ${
                       isActive
@@ -162,7 +163,7 @@ export default function AppLayout() {
               </button>
               <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
               <Separator className="my-2 bg-border/50" />
-              <button onClick={() => setDark(!dark)} className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all active:scale-[0.97]">
+              <button id="tour-theme-toggle" onClick={() => setDark(!dark)} className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all active:scale-[0.97]">
                 {dark ? <Sun className="h-4 w-4" strokeWidth={1.5} /> : <Moon className="h-4 w-4" strokeWidth={1.5} />}
                 {dark ? '浅色模式' : '深色模式'}
               </button>

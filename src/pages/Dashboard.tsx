@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import OnboardingDialog from '@/components/OnboardingDialog';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PLATFORM_LABELS, PLATFORM_COLORS, type PublishRecord, type Platform } from '@/lib/types';
@@ -46,6 +46,7 @@ function getDateThreshold(range: TimeRange): string | null {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  useOnboarding();
   const { data: allRecords = [], isLoading } = useRecords();
   const { user } = useAuth();
   const { isGuest } = useGuest();
@@ -145,7 +146,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 page-enter">
-      <OnboardingDialog />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">{getGreeting()}{isGuest ? '，访客' : user?.email ? `，${user.email.split('@')[0]}` : ''}</h1>
@@ -159,7 +159,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div id="tour-quick-actions" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Button onClick={() => navigate('/analyze')} variant="secondary" className="h-auto py-5 justify-start gap-3 zen-card">
           <div className="rounded-lg bg-muted p-2"><Search className="h-5 w-5 text-foreground" /></div>
           <div className="text-left">
