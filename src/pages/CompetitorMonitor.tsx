@@ -44,8 +44,6 @@ export default function CompetitorMonitor() {
   const [showGuestPrompt, setShowGuestPrompt] = useState(false);
   const [activeTab, setActiveTab] = useState('list');
 
-  if (isLoading) return <PageSkeleton variant="list" />;
-
   // Form state
   const [accountName, setAccountName] = useState('');
   const [title, setTitle] = useState('');
@@ -56,6 +54,39 @@ export default function CompetitorMonitor() {
   const [comments, setComments] = useState('');
   const [shares, setShares] = useState('');
 
+  // Comparison stats
+  const comparison = useMemo(() => {
+    if (competitors.length === 0 || myRecords.length === 0) return null;
+    const myAvgViews = Math.round(myRecords.reduce((s, r) => s + r.views, 0) / myRecords.length);
+    const myAvgLikes = Math.round(myRecords.reduce((s, r) => s + r.likes, 0) / myRecords.length);
+    const compAvgViews = Math.round(competitors.reduce((s, c) => s + c.views, 0) / competitors.length);
+    const compAvgLikes = Math.round(competitors.reduce((s, c) => s + c.likes, 0) / competitors.length);
+    return { myAvgViews, myAvgLikes, compAvgViews, compAvgLikes };
+  }, [competitors, myRecords]);
+
+  // Group by account
+  const accountGroups = useMemo(() => {
+    const groups: Record<string, typeof competitors> = {};
+    for (const c of competitors) {
+      if (!groups[c.accountName]) groups[c.accountName] = [];
+      groups[c.accountName].push(c);
+    }
+    return Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+  }, [competitors]);
+
+  // Trend chart data
+  const trendData = useMemo(() => {
+    if (competitors.length === 0) return [];
+    const sorted = [...competitors].sort((a, b) => a.publishedAt.localeCompare(b.publishedAt));
+    return sorted.map(c => ({
+      date: c.publishedAt.slice(5, 10),
+      views: c.views,
+      likes: c.likes,
+      account: c.accountName,
+    }));
+  }, [competitors]);
+
+  if (isLoading) return <PageSkeleton variant="list" />;
   const handleAdd = () => {
     if (!accountName.trim() || !title.trim()) { toast.error('请填写账号名和视频标题'); return; }
     const video = {
