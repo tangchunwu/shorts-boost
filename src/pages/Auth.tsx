@@ -49,8 +49,8 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-background relative">
       <Card className="w-full max-w-[420px] animate-fade-in zen-float">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto mb-4 w-[72px] h-[72px] rounded-[22px] flex items-center justify-center bg-input" style={{ boxShadow: 'var(--shadow-inset)' }}>
-            <img src={logoImg} alt="短视频增长助手" className="w-9 h-9" />
+          <div className="mx-auto mb-4 w-[88px] h-[88px] rounded-[24px] flex items-center justify-center bg-input" style={{ boxShadow: 'var(--shadow-inset)' }}>
+            <img src={logoImg} alt="短视频增长助手" className="w-12 h-12" />
           </div>
           <CardTitle className="text-2xl font-extrabold tracking-tight text-foreground">
             短视频增长助手
