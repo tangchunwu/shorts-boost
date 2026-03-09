@@ -5,12 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Platform, PLATFORM_LABELS, PLATFORM_COLORS, CalendarEvent, PublishRecord } from '@/lib/types';
 import { useCalendarEvents, useSaveCalendarEvent, useDeleteCalendarEvent, useSaveRecord } from '@/hooks/useCloudData';
 import { Plus, ChevronLeft, ChevronRight, Trash2, Check, Calendar, ArrowRightCircle, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths } from 'date-fns';
 import EmptyState from '@/components/EmptyState';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useGuest } from '@/contexts/GuestContext';
+import GuestPromptDialog from '@/components/GuestPromptDialog';
 
 function ConvertToRecordDialog({ event, onDone }: { event: CalendarEvent; onDone: () => void }) {
   const [open, setOpen] = useState(false);
@@ -89,6 +93,9 @@ export default function ContentCalendar() {
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [form, setForm] = useState({ title: '', platform: 'douyin' as Platform, date: '', status: 'planned' as 'planned' | 'published' });
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const { isGuest } = useGuest();
+  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
 
   const days = useMemo(() => {
     const start = startOfMonth(currentMonth);
@@ -124,7 +131,14 @@ export default function ContentCalendar() {
   };
 
   const handleDelete = (id: string) => {
-    deleteEventMutation.mutate(id);
+    setDeleteTarget(id);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteEventMutation.mutate(deleteTarget, {
+      onSuccess: () => { setDeleteTarget(null); toast.success('已删除'); },
+    });
   };
 
   const toggleStatus = (e: CalendarEvent) => {
@@ -135,7 +149,15 @@ export default function ContentCalendar() {
   const plannedEvents = events.filter(e => e.status === 'planned').sort((a, b) => a.date.localeCompare(b.date));
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2"><Skeleton className="h-8 w-36" /><Skeleton className="h-4 w-52" /></div>
+          <Skeleton className="h-10 w-28" />
+        </div>
+        <Skeleton className="h-[420px] rounded-xl" />
+      </div>
+    );
   }
 
   return (
