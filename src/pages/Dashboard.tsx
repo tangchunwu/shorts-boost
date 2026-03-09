@@ -167,14 +167,14 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Button onClick={() => navigate('/analyze')} className="h-auto py-4 justify-start gap-3 card-hover" style={{ backgroundImage: 'var(--gradient-primary)' }}>
+        <Button onClick={() => navigate('/analyze')} className="h-auto py-4 justify-start gap-3 card-hover btn-primary-glow text-primary-foreground rounded-xl">
           <div className="rounded-lg bg-primary-foreground/15 p-2"><Search className="h-5 w-5" /></div>
           <div className="text-left">
             <div className="font-semibold">新建 SEO 分析</div>
             <div className="text-xs opacity-80">AI 优化标题和关键词</div>
           </div>
         </Button>
-        <Button onClick={() => navigate('/records')} variant="outline" className="h-auto py-4 justify-start gap-3 card-hover">
+        <Button onClick={() => navigate('/records')} variant="outline" className="h-auto py-4 justify-start gap-3 card-hover rounded-xl border-border/60">
           <div className="rounded-lg bg-muted p-2"><FileText className="h-5 w-5 text-muted-foreground" /></div>
           <div className="text-left">
             <div className="font-semibold">添加发布记录</div>
@@ -185,10 +185,10 @@ export default function Dashboard() {
 
       {allRecords.length > 0 && (
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 animate-fade-in">
-          <div className="flex gap-1.5 bg-secondary/50 rounded-lg p-1">
+          <div className="flex gap-1 bg-secondary/60 rounded-xl p-1">
             {TIME_RANGES.map(({ value, label }) => (
               <button key={value} onClick={() => setTimeRange(value)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${timeRange === value ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${timeRange === value ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
                 {label}
               </button>
             ))}
@@ -201,7 +201,8 @@ export default function Dashboard() {
               if (p !== 'all' && count === 0) return null;
               return (
                 <button key={p} onClick={() => setPlatformFilter(p)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${isActive ? 'border-primary bg-primary text-primary-foreground shadow-sm' : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'}`}>
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-250 border ${isActive ? 'border-primary bg-primary text-primary-foreground' : 'border-border/60 bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'}`}
+                  style={isActive ? { backgroundImage: 'var(--gradient-primary)', boxShadow: 'var(--shadow-primary)' } : undefined}>
                   {p !== 'all' && <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: isActive ? 'hsl(0, 0%, 100%)' : PLATFORM_COLORS[p as Platform] }} />}
                   {p === 'all' ? '全部' : PLATFORM_LABELS[p as Platform]}
                   <span className={`text-[10px] ${isActive ? 'opacity-80' : 'opacity-60'}`}>({count})</span>
