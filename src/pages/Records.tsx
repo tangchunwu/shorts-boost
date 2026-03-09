@@ -303,7 +303,7 @@ export default function Records() {
                           <BarChart data={perRecordData}>
                             <XAxis dataKey="title" tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
                             <YAxis tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
-                            <Tooltip />
+                            <ChartTooltip />
                             <Bar dataKey="views" name="播放量" radius={[4, 4, 0, 0]}>{perRecordData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}</Bar>
                           </BarChart>
                         </ResponsiveContainer>
@@ -323,7 +323,7 @@ export default function Records() {
                               <BarChart data={barData} barGap={2}>
                                 <XAxis dataKey="metric" tick={{ fontSize: 11 }} stroke="hsl(220, 10%, 46%)" />
                                 <YAxis tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
-                                <Tooltip />
+                                <ChartTooltip />
                                 {high.length > 0 && <Bar dataKey="high" name="高表现" fill="hsl(152, 60%, 42%)" radius={[3, 3, 0, 0]} />}
                                 {low.length > 0 && <Bar dataKey="low" name="低表现" fill="hsl(0, 84%, 60%)" radius={[3, 3, 0, 0]} />}
                                 {normal.length > 0 && <Bar dataKey="normal" name="普通" fill="hsl(250, 75%, 58%)" radius={[3, 3, 0, 0]} />}
@@ -342,7 +342,7 @@ export default function Records() {
                                   <PolarRadiusAxis tick={false} axisLine={false} />
                                   <Radar name="高表现" dataKey="high" stroke="hsl(152, 60%, 42%)" fill="hsl(152, 60%, 42%)" fillOpacity={0.25} />
                                   <Radar name="低表现" dataKey="low" stroke="hsl(0, 84%, 60%)" fill="hsl(0, 84%, 60%)" fillOpacity={0.25} />
-                                  <Tooltip />
+                                  <ChartTooltip />
                                 </RadarChart>
                               </ResponsiveContainer>
                             </div>
@@ -372,7 +372,7 @@ export default function Records() {
                 <BarChart data={chartData}>
                   <XAxis dataKey="title" tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
                   <YAxis tick={{ fontSize: 11 }} stroke="hsl(220, 10%, 46%)" />
-                  <Tooltip />
+                  <ChartTooltip />
                   <Bar dataKey="views" fill="hsl(250, 75%, 58%)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
