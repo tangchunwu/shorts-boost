@@ -255,6 +255,8 @@ export default function Records() {
         </div>
       )}
 
+      <AIProgressBar active={reviewing} steps={['正在提交数据...', '分析视频表现模式...', '总结成功规律...', '生成复盘建议...']} />
+
       {reviewResult && (
         <div className="space-y-4 animate-fade-in-up">
           <Card className="border-primary/20 bg-primary/5">

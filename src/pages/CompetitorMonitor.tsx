@@ -172,6 +172,8 @@ export default function CompetitorMonitor() {
         </div>
       </div>
 
+      <AIProgressBar active={analyzing} steps={['正在提交数据...', '对比分析内容策略...', '识别优势劣势...', '生成行动建议...']} />
+
       {/* Add form */}
       {showForm && (
         <Card className="animate-scale-in">
