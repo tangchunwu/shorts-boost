@@ -12,9 +12,9 @@ interface ComplianceCheckCardProps {
 }
 
 const STATUS_CONFIG = {
-  pass: { icon: CheckCircle, color: 'text-success', bg: 'bg-success/8 border border-success/15', label: '通过' },
-  warn: { icon: AlertTriangle, color: 'text-warning', bg: 'bg-warning/8 border border-warning/15', label: '警告' },
-  fail: { icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/8 border border-destructive/15', label: '不通过' },
+  pass: { icon: CheckCircle, color: 'text-success', label: '通过' },
+  warn: { icon: AlertTriangle, color: 'text-warning', label: '警告' },
+  fail: { icon: XCircle, color: 'text-destructive', label: '不通过' },
 };
 
 export default function ComplianceCheckCard({ title, keywords, platform, className }: ComplianceCheckCardProps) {
@@ -24,14 +24,14 @@ export default function ComplianceCheckCard({ title, keywords, platform, classNa
 
   return (
     <Card className={className}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2">
-          <div className="p-1 rounded-lg bg-primary/10">
-            <ShieldCheck className="h-4 w-4 text-primary" />
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2.5">
+          <div className="p-1.5 rounded-xl bg-input" style={{ boxShadow: 'var(--shadow-inset)' }}>
+            <ShieldCheck className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
           </div>
-          平台合规检查
-          <Badge variant="secondary" className="ml-auto text-xs rounded-full">
-            {PLATFORM_LABELS[platform]} · {passCount}/{total} 通过
+          <span className="text-xs font-bold">平台合规检查</span>
+          <Badge variant="secondary" className="ml-auto">
+            {PLATFORM_LABELS[platform]} · {passCount}/{total}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -43,13 +43,12 @@ export default function ComplianceCheckCard({ title, keywords, platform, classNa
             return (
               <div
                 key={item.id}
-                className={`flex items-start gap-3 p-3 rounded-xl ${config.bg} transition-all duration-200`}
+                className="flex items-start gap-3 p-4 rounded-2xl bg-input transition-all duration-200"
+                style={{ boxShadow: 'var(--shadow-inset)' }}
               >
-                <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${config.color}`} />
+                <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${config.color}`} strokeWidth={2} />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </div>
+                  <span className="text-sm font-semibold">{item.label}</span>
                   <p className="text-xs text-muted-foreground mt-0.5">{item.result.message}</p>
                 </div>
               </div>

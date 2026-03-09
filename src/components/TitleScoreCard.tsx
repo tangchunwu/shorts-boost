@@ -28,9 +28,9 @@ function getScoreStroke(score: number): string {
 }
 
 function getScoreLabel(score: number): { text: string; icon: React.ReactNode } {
-  if (score >= 80) return { text: '优秀', icon: <Trophy className="h-4 w-4" /> };
-  if (score >= 60) return { text: '良好', icon: <TrendingUp className="h-4 w-4" /> };
-  return { text: '待改进', icon: <AlertCircle className="h-4 w-4" /> };
+  if (score >= 80) return { text: '优秀', icon: <Trophy className="h-4 w-4" strokeWidth={1.5} /> };
+  if (score >= 60) return { text: '良好', icon: <TrendingUp className="h-4 w-4" strokeWidth={1.5} /> };
+  return { text: '待改进', icon: <AlertCircle className="h-4 w-4" strokeWidth={1.5} /> };
 }
 
 export default function TitleScoreCard({ score, className }: TitleScoreCardProps) {
@@ -46,23 +46,23 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
 
   return (
     <Card className={className}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2">
-          <div className="p-1 rounded-lg bg-primary/10">
-            <Trophy className="h-4 w-4 text-primary" />
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2.5">
+          <div className="p-1.5 rounded-xl bg-input" style={{ boxShadow: 'var(--shadow-inset)' }}>
+            <Trophy className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
           </div>
-          标题评分
+          <span className="zen-label text-foreground text-xs normal-case tracking-normal font-bold">标题评分</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-8">
           {/* Score Circle */}
           <div className="flex flex-col items-center">
-            <div className="relative w-20 h-20">
+            <div className="relative w-24 h-24">
               <svg className="w-full h-full" viewBox="0 0 100 100">
                 <circle
-                  className="text-muted stroke-current"
-                  strokeWidth="8"
+                  stroke="hsl(var(--input))"
+                  strokeWidth="7"
                   fill="transparent"
                   r="42"
                   cx="50"
@@ -71,7 +71,7 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
                 <circle
                   stroke={strokeColor}
                   className="transition-all duration-700 ease-out"
-                  strokeWidth="8"
+                  strokeWidth="7"
                   strokeLinecap="round"
                   fill="transparent"
                   r="42"
@@ -83,30 +83,30 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className={`text-2xl font-bold ${scoreColor}`}>{score.overall}</span>
+                <span className={`text-3xl font-extrabold tracking-tight ${scoreColor}`}>{score.overall}</span>
               </div>
             </div>
-            <div className={`flex items-center gap-1 mt-1.5 text-sm font-medium ${scoreColor}`}>
+            <div className={`flex items-center gap-1 mt-2 text-sm font-bold ${scoreColor}`}>
               {icon}
               {scoreLabel}
             </div>
           </div>
 
           {/* Radar Chart */}
-          <div className="flex-1 h-32">
+          <div className="flex-1 h-36">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData} margin={{ top: 5, right: 20, bottom: 5, left: 20 }}>
                 <PolarGrid stroke="hsl(var(--border))" />
                 <PolarAngleAxis
                   dataKey="dimension"
-                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))', fontWeight: 600 }}
                 />
                 <Radar
                   name="评分"
                   dataKey="value"
-                  stroke="hsl(var(--primary))"
-                  fill="hsl(var(--primary))"
-                  fillOpacity={0.2}
+                  stroke="hsl(var(--foreground))"
+                  fill="hsl(var(--foreground))"
+                  fillOpacity={0.08}
                   strokeWidth={2}
                 />
               </RadarChart>
@@ -116,17 +116,17 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
 
         {/* Feedback */}
         {score.feedback && (
-          <div className="mt-3 p-3 rounded-xl bg-primary/5 border border-primary/10 text-sm text-muted-foreground">
+          <div className="mt-4 p-4 rounded-2xl bg-input text-sm text-muted-foreground" style={{ boxShadow: 'var(--shadow-inset)' }}>
             💡 {score.feedback}
           </div>
         )}
 
         {/* Dimension breakdown */}
-        <div className="grid grid-cols-4 gap-2 mt-3">
+        <div className="grid grid-cols-4 gap-3 mt-4">
           {Object.entries(score.dimensions).map(([key, value]) => (
-            <div key={key} className="text-center p-2 rounded-xl bg-secondary/50">
-              <div className={`text-lg font-semibold ${getScoreColor(value)}`}>{value}</div>
-              <div className="text-xs text-muted-foreground">{DIMENSION_LABELS[key]}</div>
+            <div key={key} className="text-center p-3 rounded-2xl bg-input" style={{ boxShadow: 'var(--shadow-inset)' }}>
+              <div className={`text-xl font-extrabold tracking-tight ${getScoreColor(value)}`}>{value}</div>
+              <div className="zen-label mt-0.5">{DIMENSION_LABELS[key]}</div>
             </div>
           ))}
         </div>

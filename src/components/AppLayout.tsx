@@ -64,30 +64,34 @@ export default function AppLayout() {
   return (
     <div className="flex min-h-screen bg-background flex-col">
       {/* Mobile top header */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-border/60 glass-strong">
-        <h1 className="text-base font-bold gradient-text">
+      <div className="md:hidden flex items-center justify-between px-5 py-3.5 glass-strong">
+        <h1 className="text-sm font-extrabold tracking-tight text-foreground">
           📈 短视频增长助手
         </h1>
-        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setDark(!dark)}>
-          {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
+        <button
+          onClick={() => setDark(!dark)}
+          className="h-9 w-9 rounded-xl flex items-center justify-center bg-input active:scale-[0.93] transition-all"
+          style={{ boxShadow: 'var(--shadow-inset)' }}
+        >
+          {dark ? <Sun className="h-4 w-4 text-muted-foreground" /> : <Moon className="h-4 w-4 text-muted-foreground" />}
+        </button>
       </div>
 
       {/* Guest banner */}
       {isGuest && (
-        <div className="bg-accent/8 border-b border-accent/15 px-4 py-2 flex items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-2 text-sm">
-            <div className="p-1 rounded-full bg-accent/15">
-              <Eye className="h-3.5 w-3.5 text-accent" />
+        <div className="bg-warning/5 border-b border-warning/10 px-5 py-2.5 flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 text-sm">
+            <div className="p-1.5 rounded-xl bg-warning/10">
+              <Eye className="h-3.5 w-3.5 text-warning" strokeWidth={2} />
             </div>
-            <span className="text-accent font-medium">访客模式</span>
-            <span className="text-muted-foreground text-xs hidden sm:inline">— 你正在使用示例数据，所有操作不会被保存</span>
+            <span className="font-semibold text-foreground text-xs">访客模式</span>
+            <span className="text-muted-foreground text-xs hidden sm:inline">— 示例数据，操作不会保存</span>
           </div>
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" className="h-7 text-xs gap-1 rounded-full" onClick={handleExitGuest}>
-              <X className="h-3 w-3" /> 退出访客
+            <Button size="sm" variant="ghost" className="h-8 text-xs gap-1.5" onClick={handleExitGuest}>
+              <X className="h-3 w-3" /> 退出
             </Button>
-            <Button size="sm" className="h-7 text-xs rounded-full btn-primary-glow" onClick={handleExitGuest}>
+            <Button size="sm" className="h-8 text-xs" onClick={handleExitGuest}>
               注册 / 登录
             </Button>
           </div>
@@ -95,106 +99,100 @@ export default function AppLayout() {
       )}
 
       <div className="flex flex-1 min-h-0">
-        {/* Sidebar */}
-        <aside className="hidden md:flex w-[260px] flex-col border-r border-border/60 bg-card/50 backdrop-blur-sm p-5">
-          <div className="mb-1 px-2">
-            <h1 className="text-lg font-bold gradient-text">
-              📈 短视频增长助手
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1">优化标题 · 提升流量</p>
-          </div>
-          <Separator className="my-4 bg-border/60" />
-          <nav className="flex-1 space-y-0.5">
-            {navItems.map(({ to, icon: Icon, label }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
-                className={({ isActive }) =>
-                  `relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-250 group ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'text-muted-foreground hover:bg-secondary/80 hover:text-foreground'
-                  }`
-                }
-                style={({ isActive }) => isActive ? { backgroundImage: 'var(--gradient-primary)', boxShadow: 'var(--shadow-primary)' } : undefined}
-              >
-                {({ isActive }) => (
-                  <>
-                    <div className={`p-1 rounded-lg transition-colors ${isActive ? 'bg-primary-foreground/15' : 'bg-transparent group-hover:bg-muted'}`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    {label}
-                  </>
-                )}
-              </NavLink>
-            ))}
-          </nav>
-          <Separator className="my-3 bg-border/60" />
-          <div className="space-y-0.5">
-            <Button variant="ghost" size="sm" onClick={() => { downloadBackup(); toast.success('备份已下载'); }} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground rounded-xl">
-              <Download className="h-4 w-4" /> 备份数据
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => restoreInputRef.current?.click()} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground rounded-xl">
-              <Upload className="h-4 w-4" /> 恢复数据
-            </Button>
-            <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
-            <Separator className="my-2 bg-border/60" />
-            <Button variant="ghost" size="sm" onClick={() => setDark(!dark)} className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground rounded-xl">
-              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              {dark ? '浅色模式' : '深色模式'}
-            </Button>
-            {isGuest ? (
-              <Button variant="ghost" size="sm" onClick={handleExitGuest} className="w-full justify-start gap-2 text-muted-foreground hover:text-primary rounded-xl">
-                <LogOut className="h-4 w-4" /> 退出访客模式
-              </Button>
-            ) : user && (
-              <>
-                <div className="px-3 py-2 mt-1 rounded-xl bg-secondary/50">
-                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleSignOut} className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive rounded-xl">
-                  <LogOut className="h-4 w-4" /> 退出登录
-                </Button>
-              </>
-            )}
+        {/* Sidebar — Frosted glass panel */}
+        <aside className="hidden md:flex w-[264px] flex-col p-4">
+          <div className="flex-1 flex flex-col rounded-[28px] bg-card p-5" style={{ boxShadow: 'var(--shadow-card)', border: '1px solid var(--glass-border-outer)' }}>
+            <div className="mb-1 px-1">
+              <h1 className="text-base font-extrabold tracking-tight text-foreground">
+                📈 短视频增长助手
+              </h1>
+              <p className="zen-label mt-1.5">优化标题 · 提升流量</p>
+            </div>
+            <Separator className="my-4 bg-border/50" />
+            <nav className="flex-1 space-y-1">
+              {navItems.map(({ to, icon: Icon, label }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={to === '/'}
+                  className={({ isActive }) =>
+                    `relative flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-[0.97] ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                    }`
+                  }
+                  style={({ isActive }) => isActive ? { boxShadow: 'var(--shadow-btn)' } : undefined}
+                >
+                  <Icon className="h-[18px] w-[18px]" strokeWidth={1.5} />
+                  {label}
+                </NavLink>
+              ))}
+            </nav>
+            <Separator className="my-3 bg-border/50" />
+            <div className="space-y-0.5">
+              <button onClick={() => { downloadBackup(); toast.success('备份已下载'); }} className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all active:scale-[0.97]">
+                <Download className="h-4 w-4" strokeWidth={1.5} /> 备份数据
+              </button>
+              <button onClick={() => restoreInputRef.current?.click()} className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all active:scale-[0.97]">
+                <Upload className="h-4 w-4" strokeWidth={1.5} /> 恢复数据
+              </button>
+              <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
+              <Separator className="my-2 bg-border/50" />
+              <button onClick={() => setDark(!dark)} className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all active:scale-[0.97]">
+                {dark ? <Sun className="h-4 w-4" strokeWidth={1.5} /> : <Moon className="h-4 w-4" strokeWidth={1.5} />}
+                {dark ? '浅色模式' : '深色模式'}
+              </button>
+              {isGuest ? (
+                <button onClick={handleExitGuest} className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all active:scale-[0.97]">
+                  <LogOut className="h-4 w-4" strokeWidth={1.5} /> 退出访客
+                </button>
+              ) : user && (
+                <>
+                  <div className="px-3 py-2 mt-1 rounded-xl bg-input" style={{ boxShadow: 'var(--shadow-inset)' }}>
+                    <p className="text-[10px] text-muted-foreground truncate uppercase tracking-wider font-bold">{user.email}</p>
+                  </div>
+                  <button onClick={handleSignOut} className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-destructive/70 hover:bg-destructive/5 hover:text-destructive transition-all active:scale-[0.97]">
+                    <LogOut className="h-4 w-4" strokeWidth={1.5} /> 退出登录
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </aside>
 
-        {/* Mobile nav */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border/60 glass-strong">
+        {/* Mobile bottom nav */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-strong">
           {isGuest && (
-            <div className="flex items-center justify-between px-3 py-1.5 bg-accent/8 border-b border-accent/15">
+            <div className="flex items-center justify-between px-3 py-1.5 bg-warning/5 border-b border-warning/10">
               <div className="flex items-center gap-1.5 text-xs">
-                <Eye className="h-3 w-3 text-accent" />
-                <span className="text-accent font-medium">访客模式</span>
+                <Eye className="h-3 w-3 text-warning" strokeWidth={2} />
+                <span className="font-bold text-foreground">访客</span>
               </div>
-              <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2 gap-1 text-accent hover:text-accent rounded-full" onClick={handleExitGuest}>
-                <X className="h-3 w-3" /> 退出
-              </Button>
+              <button onClick={handleExitGuest} className="text-[10px] font-bold text-warning uppercase tracking-wider active:scale-[0.95]">退出</button>
             </div>
           )}
-          <nav className="flex justify-around px-2 py-1.5">
+          <nav className="flex justify-around px-1 py-2">
             {navItems.map(({ to, icon: Icon, label }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) =>
-                  `flex flex-col items-center gap-0.5 py-1 px-2 text-xs transition-all duration-200 relative ${
-                    isActive ? 'text-primary' : 'text-muted-foreground'
+                  `flex flex-col items-center gap-0.5 py-1 px-2 text-[10px] transition-all duration-200 relative active:scale-[0.93] ${
+                    isActive ? 'text-foreground font-bold' : 'text-muted-foreground'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     {isActive && (
-                      <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full" style={{ backgroundImage: 'var(--gradient-primary)' }} />
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-foreground" />
                     )}
-                    <div className={`p-1 rounded-lg transition-colors ${isActive ? 'bg-primary/10' : ''}`}>
-                      <Icon className="h-4 w-4" />
+                    <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-primary text-primary-foreground' : ''}`}>
+                      <Icon className="h-4 w-4" strokeWidth={isActive ? 2 : 1.5} />
                     </div>
-                    <span className={isActive ? 'font-semibold' : ''}>{label}</span>
+                    <span className="tracking-tight">{label}</span>
                   </>
                 )}
               </NavLink>
@@ -202,8 +200,8 @@ export default function AppLayout() {
           </nav>
         </div>
 
-        {/* Main */}
-        <main className="flex-1 overflow-auto pb-20 md:pb-0">
+        {/* Main content */}
+        <main className="flex-1 overflow-auto pb-24 md:pb-0">
           <div className="mx-auto max-w-5xl p-4 md:p-8">
             <Outlet />
           </div>

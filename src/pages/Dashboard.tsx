@@ -167,14 +167,14 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Button onClick={() => navigate('/analyze')} className="h-auto py-4 justify-start gap-3 card-hover btn-primary-glow text-primary-foreground rounded-xl">
+        <Button onClick={() => navigate('/analyze')} className="h-auto py-5 justify-start gap-3 card-hover">
           <div className="rounded-lg bg-primary-foreground/15 p-2"><Search className="h-5 w-5" /></div>
           <div className="text-left">
             <div className="font-semibold">新建 SEO 分析</div>
             <div className="text-xs opacity-80">AI 优化标题和关键词</div>
           </div>
         </Button>
-        <Button onClick={() => navigate('/records')} variant="outline" className="h-auto py-4 justify-start gap-3 card-hover rounded-xl border-border/60">
+        <Button onClick={() => navigate('/records')} variant="outline" className="h-auto py-5 justify-start gap-3 card-hover">
           <div className="rounded-lg bg-muted p-2"><FileText className="h-5 w-5 text-muted-foreground" /></div>
           <div className="text-left">
             <div className="font-semibold">添加发布记录</div>

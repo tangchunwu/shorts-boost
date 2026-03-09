@@ -14,11 +14,11 @@ export interface Insight {
   description: string;
 }
 
-const INSIGHT_CONFIG: Record<string, { icon: typeof TrendingUp; color: string; bg: string }> = {
-  trend: { icon: TrendingUp, color: 'text-primary', bg: 'bg-primary/10' },
-  anomaly: { icon: Activity, color: 'text-accent', bg: 'bg-accent/10' },
-  tip: { icon: Lightbulb, color: 'text-success', bg: 'bg-success/10' },
-  warning: { icon: AlertTriangle, color: 'text-warning', bg: 'bg-warning/10' },
+const INSIGHT_CONFIG: Record<string, { icon: typeof TrendingUp; color: string }> = {
+  trend: { icon: TrendingUp, color: 'text-foreground' },
+  anomaly: { icon: Activity, color: 'text-destructive' },
+  tip: { icon: Lightbulb, color: 'text-success' },
+  warning: { icon: AlertTriangle, color: 'text-warning' },
 };
 
 interface Props {
@@ -36,20 +36,14 @@ export default function AIInsightsCard({ records, onInsightsChange }: Props) {
 
   const fetchInsights = async () => {
     if (isGuest) { setShowGuestPrompt(true); return; }
-    if (records.length === 0) {
-      toast.error('暂无发布记录，无法分析');
-      return;
-    }
+    if (records.length === 0) { toast.error('暂无发布记录'); return; }
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('ai-insights', {
         body: { records: records.slice(0, 50) },
       });
       if (error) throw error;
-      if (data.error) {
-        toast.error(data.error);
-        return;
-      }
+      if (data.error) { toast.error(data.error); return; }
       const newInsights = data.insights || [];
       setInsights(newInsights);
       setRawContent(data.rawContent || '');
@@ -57,7 +51,7 @@ export default function AIInsightsCard({ records, onInsightsChange }: Props) {
       onInsightsChange?.(newInsights);
     } catch (e: any) {
       console.error('AI insights error:', e);
-      toast.error('AI 洞察分析失败，请稍后重试');
+      toast.error('AI 洞察分析失败');
     } finally {
       setLoading(false);
     }
@@ -67,9 +61,11 @@ export default function AIInsightsCard({ records, onInsightsChange }: Props) {
     <Card className="animate-fade-in-up overflow-hidden">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-accent" />
-            AI 智能洞察
+          <CardTitle className="text-base flex items-center gap-2.5">
+            <div className="p-1.5 rounded-xl bg-input" style={{ boxShadow: 'var(--shadow-inset)' }}>
+              <Sparkles className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+            </div>
+            <span className="text-xs font-bold">AI 智能洞察</span>
           </CardTitle>
           <Button
             variant="ghost"
@@ -78,55 +74,55 @@ export default function AIInsightsCard({ records, onInsightsChange }: Props) {
             disabled={loading || records.length === 0}
             className="gap-1.5 text-xs"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} strokeWidth={1.5} />
             {hasLoaded ? '刷新' : '生成洞察'}
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         {!hasLoaded && !loading && (
-          <div className="text-center py-6">
-            <Sparkles className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground mb-3">
-              基于你的发布数据，AI 将自动分析趋势、发现异常并给出增长建议
+          <div className="text-center py-10">
+            <div className="rounded-[28px] bg-input p-5 inline-block mb-4" style={{ boxShadow: 'var(--shadow-inset)' }}>
+              <Sparkles className="h-8 w-8 text-muted-foreground/40" strokeWidth={1.5} />
+            </div>
+            <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
+              基于发布数据，AI 将分析趋势、发现异常并给出增长建议
             </p>
             <Button
               onClick={fetchInsights}
               disabled={records.length === 0}
               size="sm"
-              className="gap-2 btn-primary-glow text-primary-foreground rounded-xl"
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} />
               开始分析
             </Button>
             {records.length === 0 && (
-              <p className="text-xs text-muted-foreground mt-2">需要先添加发布记录</p>
+              <p className="zen-label mt-3">需要先添加发布记录</p>
             )}
           </div>
         )}
 
         {loading && (
-          <div className="flex items-center justify-center py-8 gap-3">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <span className="text-sm text-muted-foreground">AI 正在分析你的数据...</span>
+          <div className="flex items-center justify-center py-10 gap-3">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+            <span className="text-sm text-muted-foreground">AI 正在分析…</span>
           </div>
         )}
 
         {hasLoaded && !loading && insights.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {insights.map((insight, i) => {
               const config = INSIGHT_CONFIG[insight.type] || INSIGHT_CONFIG.tip;
               const Icon = config.icon;
               return (
                 <div
                   key={i}
-                  className="flex items-start gap-3 p-3 rounded-xl bg-secondary/40 hover:bg-secondary/60 transition-colors"
+                  className="flex items-start gap-3 p-4 rounded-2xl bg-input transition-all duration-200"
+                  style={{ boxShadow: 'var(--shadow-inset)' }}
                 >
-                  <div className={`rounded-lg p-1.5 shrink-0 ${config.bg}`}>
-                    <Icon className={`h-3.5 w-3.5 ${config.color}`} />
-                  </div>
+                  <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${config.color}`} strokeWidth={2} />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium">{insight.title}</p>
+                    <p className="text-sm font-semibold">{insight.title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{insight.description}</p>
                   </div>
                 </div>
@@ -136,7 +132,7 @@ export default function AIInsightsCard({ records, onInsightsChange }: Props) {
         )}
 
         {hasLoaded && !loading && insights.length === 0 && rawContent && (
-          <div className="p-3 rounded-xl bg-secondary/40">
+          <div className="p-4 rounded-2xl bg-input" style={{ boxShadow: 'var(--shadow-inset)' }}>
             <p className="text-sm text-muted-foreground whitespace-pre-wrap">{rawContent}</p>
           </div>
         )}
