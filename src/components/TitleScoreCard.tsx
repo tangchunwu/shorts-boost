@@ -16,9 +16,15 @@ const DIMENSION_LABELS: Record<string, string> = {
 };
 
 function getScoreColor(score: number): string {
-  if (score >= 80) return 'text-green-500';
-  if (score >= 60) return 'text-yellow-500';
-  return 'text-red-500';
+  if (score >= 80) return 'text-success';
+  if (score >= 60) return 'text-warning';
+  return 'text-destructive';
+}
+
+function getScoreStroke(score: number): string {
+  if (score >= 80) return 'hsl(var(--success))';
+  if (score >= 60) return 'hsl(var(--warning))';
+  return 'hsl(var(--destructive))';
 }
 
 function getScoreLabel(score: number): { text: string; icon: React.ReactNode } {
@@ -36,12 +42,15 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
 
   const { text: scoreLabel, icon } = getScoreLabel(score.overall);
   const scoreColor = getScoreColor(score.overall);
+  const strokeColor = getScoreStroke(score.overall);
 
   return (
     <Card className={className}>
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">
-          <Trophy className="h-4 w-4 text-primary" />
+          <div className="p-1 rounded-lg bg-primary/10">
+            <Trophy className="h-4 w-4 text-primary" />
+          </div>
           标题评分
         </CardTitle>
       </CardHeader>
@@ -60,7 +69,8 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
                   cy="50"
                 />
                 <circle
-                  className={`${scoreColor} stroke-current transition-all duration-500`}
+                  stroke={strokeColor}
+                  className="transition-all duration-700 ease-out"
                   strokeWidth="8"
                   strokeLinecap="round"
                   fill="transparent"
@@ -76,7 +86,7 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
                 <span className={`text-2xl font-bold ${scoreColor}`}>{score.overall}</span>
               </div>
             </div>
-            <div className={`flex items-center gap-1 mt-1 text-sm font-medium ${scoreColor}`}>
+            <div className={`flex items-center gap-1 mt-1.5 text-sm font-medium ${scoreColor}`}>
               {icon}
               {scoreLabel}
             </div>
@@ -96,7 +106,7 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
                   dataKey="value"
                   stroke="hsl(var(--primary))"
                   fill="hsl(var(--primary))"
-                  fillOpacity={0.3}
+                  fillOpacity={0.2}
                   strokeWidth={2}
                 />
               </RadarChart>
@@ -106,7 +116,7 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
 
         {/* Feedback */}
         {score.feedback && (
-          <div className="mt-3 p-2.5 rounded-lg bg-muted/50 text-sm text-muted-foreground">
+          <div className="mt-3 p-3 rounded-xl bg-primary/5 border border-primary/10 text-sm text-muted-foreground">
             💡 {score.feedback}
           </div>
         )}
@@ -114,7 +124,7 @@ export default function TitleScoreCard({ score, className }: TitleScoreCardProps
         {/* Dimension breakdown */}
         <div className="grid grid-cols-4 gap-2 mt-3">
           {Object.entries(score.dimensions).map(([key, value]) => (
-            <div key={key} className="text-center">
+            <div key={key} className="text-center p-2 rounded-xl bg-secondary/50">
               <div className={`text-lg font-semibold ${getScoreColor(value)}`}>{value}</div>
               <div className="text-xs text-muted-foreground">{DIMENSION_LABELS[key]}</div>
             </div>

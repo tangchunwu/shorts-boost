@@ -12,9 +12,9 @@ interface ComplianceCheckCardProps {
 }
 
 const STATUS_CONFIG = {
-  pass: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-500/10', label: '通过' },
-  warn: { icon: AlertTriangle, color: 'text-yellow-500', bg: 'bg-yellow-500/10', label: '警告' },
-  fail: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-500/10', label: '不通过' },
+  pass: { icon: CheckCircle, color: 'text-success', bg: 'bg-success/8 border border-success/15', label: '通过' },
+  warn: { icon: AlertTriangle, color: 'text-warning', bg: 'bg-warning/8 border border-warning/15', label: '警告' },
+  fail: { icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/8 border border-destructive/15', label: '不通过' },
 };
 
 export default function ComplianceCheckCard({ title, keywords, platform, className }: ComplianceCheckCardProps) {
@@ -26,9 +26,11 @@ export default function ComplianceCheckCard({ title, keywords, platform, classNa
     <Card className={className}>
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">
-          <ShieldCheck className="h-4 w-4 text-primary" />
+          <div className="p-1 rounded-lg bg-primary/10">
+            <ShieldCheck className="h-4 w-4 text-primary" />
+          </div>
           平台合规检查
-          <Badge variant="secondary" className="ml-auto text-xs">
+          <Badge variant="secondary" className="ml-auto text-xs rounded-full">
             {PLATFORM_LABELS[platform]} · {passCount}/{total} 通过
           </Badge>
         </CardTitle>
@@ -41,7 +43,7 @@ export default function ComplianceCheckCard({ title, keywords, platform, classNa
             return (
               <div
                 key={item.id}
-                className={`flex items-start gap-3 p-2.5 rounded-lg ${config.bg} transition-colors`}
+                className={`flex items-start gap-3 p-3 rounded-xl ${config.bg} transition-all duration-200`}
               >
                 <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${config.color}`} />
                 <div className="flex-1 min-w-0">

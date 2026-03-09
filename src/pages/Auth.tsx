@@ -47,20 +47,27 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md animate-fade-in">
-        <CardHeader className="text-center">
-          <img src={logoImg} alt="短视频增长助手" className="w-14 h-14 mx-auto mb-2" />
-          <CardTitle className="text-xl bg-clip-text text-transparent" style={{ backgroundImage: 'var(--gradient-primary)' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 dot-pattern opacity-40" />
+      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/8 rounded-full blur-3xl animate-pulse-soft" />
+      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-accent/8 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1.2s' }} />
+
+      <Card className="w-full max-w-md animate-fade-in relative z-10 shadow-lg border-border/60">
+        <CardHeader className="text-center pb-4">
+          <div className="mx-auto mb-3 w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10 shadow-inner">
+            <img src={logoImg} alt="短视频增长助手" className="w-10 h-10" />
+          </div>
+          <CardTitle className="text-2xl font-bold gradient-text">
             短视频增长助手
           </CardTitle>
-          <CardDescription>优化标题 · 提升流量 · 数据驱动</CardDescription>
+          <CardDescription className="text-muted-foreground">优化标题 · 提升流量 · 数据驱动</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={tab} onValueChange={v => setTab(v as 'login' | 'signup')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">登录</TabsTrigger>
-              <TabsTrigger value="signup">注册</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 rounded-xl bg-secondary/60">
+              <TabsTrigger value="login" className="rounded-lg">登录</TabsTrigger>
+              <TabsTrigger value="signup" className="rounded-lg">注册</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
@@ -69,17 +76,17 @@ export default function Auth() {
                   <Label htmlFor="login-email">邮箱</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="login-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-9" required />
+                    <Input id="login-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-9 rounded-xl" required />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">密码</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="login-password" type="password" placeholder="••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-9" required />
+                    <Input id="login-password" type="password" placeholder="••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-9 rounded-xl" required />
                   </div>
                 </div>
-                <Button type="submit" disabled={loading} className="w-full" style={{ backgroundImage: 'var(--gradient-primary)' }}>
+                <Button type="submit" disabled={loading} className="w-full rounded-xl btn-primary-glow text-primary-foreground">
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '登录'}
                 </Button>
                 <div className="text-center">
@@ -96,38 +103,38 @@ export default function Auth() {
                   <Label htmlFor="signup-username">用户名</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="signup-username" placeholder="你的昵称" value={username} onChange={e => setUsername(e.target.value)} className="pl-9" />
+                    <Input id="signup-username" placeholder="你的昵称" value={username} onChange={e => setUsername(e.target.value)} className="pl-9 rounded-xl" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">邮箱</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="signup-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-9" required />
+                    <Input id="signup-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-9 rounded-xl" required />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">密码</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="signup-password" type="password" placeholder="至少 6 个字符" value={password} onChange={e => setPassword(e.target.value)} className="pl-9" required minLength={6} />
+                    <Input id="signup-password" type="password" placeholder="至少 6 个字符" value={password} onChange={e => setPassword(e.target.value)} className="pl-9 rounded-xl" required minLength={6} />
                   </div>
                 </div>
-                <Button type="submit" disabled={loading} className="w-full" style={{ backgroundImage: 'var(--gradient-primary)' }}>
+                <Button type="submit" disabled={loading} className="w-full rounded-xl btn-primary-glow text-primary-foreground">
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '注册'}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
 
-          <div className="mt-4">
+          <div className="mt-5">
             <div className="relative">
-              <Separator />
-              <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">或</span>
+              <Separator className="bg-border/60" />
+              <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs text-muted-foreground">或</span>
             </div>
             <Button
               variant="outline"
-              className="w-full mt-4 gap-2 border-dashed"
+              className="w-full mt-4 gap-2 border-dashed rounded-xl hover:bg-secondary/60 transition-all"
               onClick={enterGuestMode}
             >
               <Eye className="h-4 w-4" />

@@ -121,7 +121,7 @@ export default function CompetitorMonitor() {
           <h1 className="text-2xl font-bold">竞品监控</h1>
           <p className="text-muted-foreground text-sm mt-1">记录竞品视频数据，对比分析差距</p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)} size="sm" style={{ backgroundImage: 'var(--gradient-primary)' }}>
+        <Button onClick={() => setShowForm(!showForm)} size="sm" className="btn-primary-glow text-primary-foreground rounded-xl">
           <Plus className="h-4 w-4 mr-1" /> 添加竞品视频
         </Button>
       </div>
@@ -196,9 +196,9 @@ export default function CompetitorMonitor() {
                   <span className="text-xs text-muted-foreground">竞品</span>
                 </div>
                 {comparison.myAvgViews < comparison.compAvgViews ? (
-                  <p className="text-xs text-red-500 mt-1">差距 {((comparison.compAvgViews - comparison.myAvgViews) / comparison.compAvgViews * 100).toFixed(0)}%</p>
+                  <p className="text-xs text-destructive mt-1">差距 {((comparison.compAvgViews - comparison.myAvgViews) / comparison.compAvgViews * 100).toFixed(0)}%</p>
                 ) : (
-                  <p className="text-xs text-green-500 mt-1">领先 {((comparison.myAvgViews - comparison.compAvgViews) / comparison.myAvgViews * 100).toFixed(0)}%</p>
+                  <p className="text-xs text-success mt-1">领先 {((comparison.myAvgViews - comparison.compAvgViews) / comparison.myAvgViews * 100).toFixed(0)}%</p>
                 )}
               </div>
               <div>
@@ -212,9 +212,9 @@ export default function CompetitorMonitor() {
                   <span className="text-xs text-muted-foreground">竞品</span>
                 </div>
                 {comparison.myAvgLikes < comparison.compAvgLikes ? (
-                  <p className="text-xs text-red-500 mt-1">差距 {((comparison.compAvgLikes - comparison.myAvgLikes) / comparison.compAvgLikes * 100).toFixed(0)}%</p>
+                  <p className="text-xs text-destructive mt-1">差距 {((comparison.compAvgLikes - comparison.myAvgLikes) / comparison.compAvgLikes * 100).toFixed(0)}%</p>
                 ) : (
-                  <p className="text-xs text-green-500 mt-1">领先 {((comparison.myAvgLikes - comparison.compAvgLikes) / comparison.myAvgLikes * 100).toFixed(0)}%</p>
+                  <p className="text-xs text-success mt-1">领先 {((comparison.myAvgLikes - comparison.compAvgLikes) / comparison.myAvgLikes * 100).toFixed(0)}%</p>
                 )}
               </div>
             </div>

@@ -183,7 +183,7 @@ export default function ContentCalendar() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button style={{ backgroundImage: 'var(--gradient-primary)' }}><Plus className="h-4 w-4 mr-1" /> 添加计划</Button>
+            <Button className="btn-primary-glow text-primary-foreground rounded-xl"><Plus className="h-4 w-4 mr-1" /> 添加计划</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>添加内容计划</DialogTitle></DialogHeader>
