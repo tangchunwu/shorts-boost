@@ -11,26 +11,26 @@ export default function AnimatedOutlet() {
   const [displayedOutlet, setDisplayedOutlet] = useState(outlet);
   const [animClass, setAnimClass] = useState('page-transition-enter');
   const prevPath = useRef(location.pathname);
+  const currentOutlet = useRef(outlet);
+
+  // Track latest outlet
+  currentOutlet.current = outlet;
 
   useEffect(() => {
     if (location.pathname !== prevPath.current) {
-      // Start exit
+      // Start exit animation
       setAnimClass('page-transition-exit');
       const timer = setTimeout(() => {
-        setDisplayedOutlet(outlet);
+        setDisplayedOutlet(currentOutlet.current);
         setAnimClass('page-transition-enter');
         prevPath.current = location.pathname;
       }, 150); // match CSS duration
       return () => clearTimeout(timer);
-    }
-  }, [location.pathname, outlet]);
-
-  // Also update outlet content when it changes on same route
-  useEffect(() => {
-    if (location.pathname === prevPath.current) {
+    } else {
+      // Same path - just update outlet immediately without animation
       setDisplayedOutlet(outlet);
     }
-  }, [outlet, location.pathname]);
+  }, [location.pathname, outlet]);
 
   return (
     <div className={animClass}>
