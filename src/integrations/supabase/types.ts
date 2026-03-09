@@ -85,6 +85,48 @@ export type Database = {
           },
         ]
       }
+      competitor_videos: {
+        Row: {
+          account_name: string
+          comments: number
+          created_at: string
+          id: string
+          likes: number
+          platform: string
+          published_at: string
+          shares: number
+          title: string
+          user_id: string
+          views: number
+        }
+        Insert: {
+          account_name: string
+          comments?: number
+          created_at?: string
+          id?: string
+          likes?: number
+          platform: string
+          published_at: string
+          shares?: number
+          title: string
+          user_id: string
+          views?: number
+        }
+        Update: {
+          account_name?: string
+          comments?: number
+          created_at?: string
+          id?: string
+          likes?: number
+          platform?: string
+          published_at?: string
+          shares?: number
+          title?: string
+          user_id?: string
+          views?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
