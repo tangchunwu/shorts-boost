@@ -37,11 +37,23 @@ export interface AnalysisHistory {
   createdAt: string;
 }
 
+export interface TitleScore {
+  overall: number;
+  dimensions: {
+    appeal: number;       // 吸引力
+    keywords: number;     // 关键词密度
+    platformFit: number;  // 平台适配度
+    length: number;       // 字数合理性
+  };
+  feedback: string;       // 改进建议
+}
+
 export interface SEOSuggestion {
   titles: string[];
   keywords: string[];
   tips: string[];
   bestPostTime: string;
+  titleScore?: TitleScore;
 }
 
 export interface CalendarEvent {
