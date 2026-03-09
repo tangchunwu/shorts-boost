@@ -46,6 +46,7 @@ function getDateThreshold(range: TimeRange): string | null {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  useOnboarding();
   const { data: allRecords = [], isLoading } = useRecords();
   const { user } = useAuth();
   const { isGuest } = useGuest();
