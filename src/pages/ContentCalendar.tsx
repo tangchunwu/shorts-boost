@@ -255,7 +255,7 @@ export default function ContentCalendar() {
                   </div>
                 </div>
                 <div className="flex gap-1 shrink-0">
-                  <ConvertToRecordDialog event={e} onDone={() => {}} />
+                  <ConvertToRecordDialog event={e} onDone={() => {}} onGuestBlock={() => setShowGuestPrompt(true)} />
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => toggleStatus(e)}><Check className="h-3.5 w-3.5" /></Button>
                   <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(e.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
