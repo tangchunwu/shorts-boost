@@ -15,6 +15,7 @@ import { useRecords } from '@/hooks/useCloudData';
 import { exportDashboardPDF } from '@/lib/exportPDF';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import PageSkeleton from '@/components/PageSkeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGuest } from '@/contexts/GuestContext';
 
@@ -139,18 +140,7 @@ export default function Dashboard() {
   const PIE_COLORS = pieData.map(d => PLATFORM_COLORS[d.platform]);
 
   if (isLoading) {
-    return (
-      <div className="space-y-6 page-enter">
-        <div className="space-y-2">
-          <div className="skeleton-shimmer h-8 w-48" />
-          <div className="skeleton-shimmer h-4 w-64" />
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[1,2,3,4].map(i => <div key={i} className="skeleton-shimmer h-24 rounded-[28px]" />)}
-        </div>
-        <div className="skeleton-shimmer h-48 rounded-[28px]" />
-      </div>
-    );
+    return <PageSkeleton variant="dashboard" />;
   }
 
   return (

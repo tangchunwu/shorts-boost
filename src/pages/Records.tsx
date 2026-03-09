@@ -21,6 +21,7 @@ import EmptyState from '@/components/EmptyState';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
 import { useGuest } from '@/contexts/GuestContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import PageSkeleton from '@/components/PageSkeleton';
 
 interface ReviewResult {
   summary: string;
@@ -167,15 +168,7 @@ export default function Records() {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2"><Skeleton className="h-8 w-36" /><Skeleton className="h-4 w-52" /></div>
-          <Skeleton className="h-10 w-28" />
-        </div>
-        <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-28 rounded-xl" />)}</div>
-      </div>
-    );
+    return <PageSkeleton variant="list" />;
   }
 
   return (
