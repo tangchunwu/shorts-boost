@@ -37,12 +37,14 @@ export default function CompetitorMonitor() {
   const { data: myRecords = [] } = useRecords();
   const { isGuest } = useGuest();
 
-  if (isLoading) return <PageSkeleton variant="list" />;
+  const [showForm, setShowForm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [report, setReport] = useState<CompetitorReport | null>(null);
   const [showGuestPrompt, setShowGuestPrompt] = useState(false);
   const [activeTab, setActiveTab] = useState('list');
+
+  if (isLoading) return <PageSkeleton variant="list" />;
 
   // Form state
   const [accountName, setAccountName] = useState('');
