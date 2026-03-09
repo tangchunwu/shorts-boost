@@ -252,6 +252,21 @@ export default function ContentCalendar() {
       ) : events.length === 0 ? (
         <EmptyState icon={Calendar} title="还没有内容计划" description="点击日历格子或「添加计划」开始规划你的发布节奏 📅" />
       ) : null}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={open => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>删除后无法恢复，确定要删除这条计划吗？</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <GuestPromptDialog open={showGuestPrompt} onOpenChange={setShowGuestPrompt} featureName="转为发布记录" />
     </div>
   );
 }
