@@ -17,6 +17,8 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import EmptyState from '@/components/EmptyState';
+import GuestPromptDialog from '@/components/GuestPromptDialog';
+import { useGuest } from '@/contexts/GuestContext';
 
 function AddToCalendarButton({ title, platform }: { title: string; platform: Platform }) {
   const [date, setDate] = useState<Date>();
@@ -123,8 +125,11 @@ export default function Analyze() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState('analyze');
+  const { isGuest } = useGuest();
+  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
 
   const handleAnalyze = async () => {
+    if (isGuest) { setShowGuestPrompt(true); return; }
     if (!title.trim() && !script.trim()) { toast.error('请输入标题或脚本内容'); return; }
     setLoading(true);
     setResult(null);
@@ -278,6 +283,7 @@ export default function Analyze() {
           )}
         </TabsContent>
       </Tabs>
+      <GuestPromptDialog open={showGuestPrompt} onOpenChange={setShowGuestPrompt} featureName="AI 分析" />
     </div>
   );
 }
