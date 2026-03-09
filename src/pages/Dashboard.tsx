@@ -138,15 +138,15 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 page-enter">
         <div className="space-y-2">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-64" />
+          <div className="skeleton-shimmer h-8 w-48" />
+          <div className="skeleton-shimmer h-4 w-64" />
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[1,2,3,4].map(i => <Skeleton key={i} className="h-24 rounded-xl" />)}
+          {[1,2,3,4].map(i => <div key={i} className="skeleton-shimmer h-24 rounded-[28px]" />)}
         </div>
-        <Skeleton className="h-48 rounded-xl" />
+        <div className="skeleton-shimmer h-48 rounded-[28px]" />
       </div>
     );
   }
@@ -202,7 +202,7 @@ export default function Dashboard() {
               return (
                 <button key={p} onClick={() => setPlatformFilter(p)}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-250 border ${isActive ? 'border-primary bg-primary text-primary-foreground' : 'border-border/60 bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'}`}
-                  style={isActive ? { backgroundImage: 'var(--gradient-primary)', boxShadow: 'var(--shadow-primary)' } : undefined}>
+                  style={undefined}>
                   {p !== 'all' && <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: isActive ? 'hsl(0, 0%, 100%)' : PLATFORM_COLORS[p as Platform] }} />}
                   {p === 'all' ? '全部' : PLATFORM_LABELS[p as Platform]}
                   <span className={`text-[10px] ${isActive ? 'opacity-80' : 'opacity-60'}`}>({count})</span>
@@ -213,15 +213,15 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {stats.map(({ label, value, icon: Icon, color }, i) => (
-          <Card key={label} className={`card-hover animate-fade-in-up animate-stagger-${i + 1}`}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-grid">
+        {stats.map(({ label, value, icon: Icon, color }) => (
+          <Card key={label} className="card-hover">
             <CardContent className="p-4">
               <div className="flex items-center gap-2.5 mb-2">
                 <div className={`rounded-lg p-1.5 ${color}`}><Icon className="h-3.5 w-3.5" /></div>
                 <span className="text-xs text-muted-foreground">{label}</span>
               </div>
-              <div className="text-xl font-bold">{value}</div>
+              <div className="text-xl font-bold num-pop">{value}</div>
             </CardContent>
           </Card>
         ))}
