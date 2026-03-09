@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut, Eye, X } from 'lucide-react';
+import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut, Eye, X, Flame, Users } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -11,8 +11,10 @@ import { toast } from 'sonner';
 const navItems = [
   { to: '/', icon: BarChart3, label: '仪表盘' },
   { to: '/analyze', icon: Search, label: 'SEO 分析' },
+  { to: '/trending', icon: Flame, label: '热门话题' },
   { to: '/records', icon: FileText, label: '发布记录' },
   { to: '/calendar', icon: Calendar, label: '内容日历' },
+  { to: '/competitors', icon: Users, label: '竞品监控' },
 ];
 
 export default function AppLayout() {
