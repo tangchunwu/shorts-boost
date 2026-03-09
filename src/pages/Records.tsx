@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star, Download, Upload, FileText, Search, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
+import ChartTooltip from '@/components/ChartTooltip';
 import { useRef } from 'react';
 import EmptyState from '@/components/EmptyState';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
@@ -93,6 +94,7 @@ export default function Records() {
 
   const handleSubmit = () => {
     if (!form.title.trim()) { toast.error('请输入标题'); return; }
+    if (form.title.trim().length < 2) { toast.error('标题至少需要 2 个字符'); return; }
     const views = parseInt(form.views) || 0;
     const likes = parseInt(form.likes) || 0;
     const comments = parseInt(form.comments) || 0;
@@ -101,6 +103,7 @@ export default function Records() {
       toast.error('数据不能为负数');
       return;
     }
+    if (!form.publishedAt) { toast.error('请选择发布日期'); return; }
     const record: PublishRecord = {
       id: crypto.randomUUID(),
       title: form.title,
@@ -300,7 +303,7 @@ export default function Records() {
                           <BarChart data={perRecordData}>
                             <XAxis dataKey="title" tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
                             <YAxis tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
-                            <Tooltip />
+                            <Tooltip content={<ChartTooltip />} cursor={false} />
                             <Bar dataKey="views" name="播放量" radius={[4, 4, 0, 0]}>{perRecordData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}</Bar>
                           </BarChart>
                         </ResponsiveContainer>
@@ -320,7 +323,7 @@ export default function Records() {
                               <BarChart data={barData} barGap={2}>
                                 <XAxis dataKey="metric" tick={{ fontSize: 11 }} stroke="hsl(220, 10%, 46%)" />
                                 <YAxis tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
-                                <Tooltip />
+                                <Tooltip content={<ChartTooltip />} cursor={false} />
                                 {high.length > 0 && <Bar dataKey="high" name="高表现" fill="hsl(152, 60%, 42%)" radius={[3, 3, 0, 0]} />}
                                 {low.length > 0 && <Bar dataKey="low" name="低表现" fill="hsl(0, 84%, 60%)" radius={[3, 3, 0, 0]} />}
                                 {normal.length > 0 && <Bar dataKey="normal" name="普通" fill="hsl(250, 75%, 58%)" radius={[3, 3, 0, 0]} />}
@@ -339,7 +342,7 @@ export default function Records() {
                                   <PolarRadiusAxis tick={false} axisLine={false} />
                                   <Radar name="高表现" dataKey="high" stroke="hsl(152, 60%, 42%)" fill="hsl(152, 60%, 42%)" fillOpacity={0.25} />
                                   <Radar name="低表现" dataKey="low" stroke="hsl(0, 84%, 60%)" fill="hsl(0, 84%, 60%)" fillOpacity={0.25} />
-                                  <Tooltip />
+                                  <Tooltip content={<ChartTooltip />} />
                                 </RadarChart>
                               </ResponsiveContainer>
                             </div>
@@ -369,7 +372,7 @@ export default function Records() {
                 <BarChart data={chartData}>
                   <XAxis dataKey="title" tick={{ fontSize: 10 }} stroke="hsl(220, 10%, 46%)" />
                   <YAxis tick={{ fontSize: 11 }} stroke="hsl(220, 10%, 46%)" />
-                  <Tooltip />
+                  <Tooltip content={<ChartTooltip />} cursor={false} />
                   <Bar dataKey="views" fill="hsl(250, 75%, 58%)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

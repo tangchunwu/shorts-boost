@@ -5,6 +5,7 @@ import { PLATFORM_LABELS, PLATFORM_COLORS, type PublishRecord, type Platform } f
 import { Search, FileText, TrendingUp, Eye, ThumbsUp, MessageSquare, BarChart3, Share2, Percent, Download } from 'lucide-react';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import ChartTooltip from '@/components/ChartTooltip';
 import EmptyState from '@/components/EmptyState';
 import CompetitorCompare from '@/components/CompetitorCompare';
 import AIInsightsCard, { type Insight } from '@/components/AIInsightsCard';
@@ -252,12 +253,12 @@ export default function Dashboard() {
             <CardHeader className="pb-2"><CardTitle className="text-base">📊 播放量平台分布</CardTitle></CardHeader>
             <CardContent>
               <div className="h-56">
-                <ResponsiveContainer width="100%" height="100%">
+               <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={pieData} dataKey="views" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={40} paddingAngle={3} strokeWidth={0}>
+                    <Pie data={pieData} dataKey="views" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={40} paddingAngle={3} strokeWidth={0} animationBegin={0} animationDuration={800}>
                       {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
                     </Pie>
-                    <Tooltip formatter={(value: number) => value.toLocaleString()} />
+                    <Tooltip content={<ChartTooltip />} cursor={false} />
                     <Legend iconType="circle" iconSize={8} />
                   </PieChart>
                 </ResponsiveContainer>
@@ -268,12 +269,12 @@ export default function Dashboard() {
             <CardHeader className="pb-2"><CardTitle className="text-base">👍 点赞数平台分布</CardTitle></CardHeader>
             <CardContent>
               <div className="h-56">
-                <ResponsiveContainer width="100%" height="100%">
+               <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={pieData} dataKey="likes" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={40} paddingAngle={3} strokeWidth={0}>
+                    <Pie data={pieData} dataKey="likes" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={40} paddingAngle={3} strokeWidth={0} animationBegin={200} animationDuration={800}>
                       {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
                     </Pie>
-                    <Tooltip formatter={(value: number) => value.toLocaleString()} />
+                    <Tooltip content={<ChartTooltip />} cursor={false} />
                     <Legend iconType="circle" iconSize={8} />
                   </PieChart>
                 </ResponsiveContainer>
@@ -292,14 +293,19 @@ export default function Dashboard() {
                 <AreaChart data={chartData}>
                    <defs>
                     <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(220, 25%, 55%)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(220, 25%, 55%)" stopOpacity={0} />
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.15} />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="likesGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={0.15} />
+                      <stop offset="100%" stopColor="hsl(var(--success))" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(220, 8%, 50%)" />
-                  <YAxis tick={{ fontSize: 11 }} stroke="hsl(220, 8%, 50%)" />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="views" stroke="hsl(220, 25%, 55%)" fill="url(#viewsGrad)" strokeWidth={2} />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground) / 0.3)" axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground) / 0.3)" axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'hsl(var(--muted-foreground) / 0.15)' }} />
+                  <Area type="monotone" dataKey="views" name="播放量" stroke="hsl(var(--foreground))" fill="url(#viewsGrad)" strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2, fill: 'hsl(var(--card))' }} animationDuration={1000} />
+                  <Area type="monotone" dataKey="likes" name="点赞数" stroke="hsl(var(--success))" fill="url(#likesGrad)" strokeWidth={1.5} dot={false} activeDot={{ r: 3, strokeWidth: 2, fill: 'hsl(var(--card))' }} animationDuration={1200} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
