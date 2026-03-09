@@ -1,10 +1,11 @@
-import { NavLink, Outlet } from 'react-router-dom';
-import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut } from 'lucide-react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut, Eye, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { downloadBackup, restoreFromBackup } from '@/lib/storage';
 import { useAuth } from '@/contexts/AuthContext';
+import { useGuest } from '@/contexts/GuestContext';
 import { toast } from 'sonner';
 
 const navItems = [
