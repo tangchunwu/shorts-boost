@@ -159,7 +159,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div id="tour-quick-actions" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Button onClick={() => navigate('/analyze')} variant="secondary" className="h-auto py-5 justify-start gap-3 zen-card">
           <div className="rounded-lg bg-muted p-2"><Search className="h-5 w-5 text-foreground" /></div>
           <div className="text-left">
