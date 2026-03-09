@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths } from 'date-fns';
 import EmptyState from '@/components/EmptyState';
 import { Skeleton } from '@/components/ui/skeleton';
+import PageSkeleton from '@/components/PageSkeleton';
 import { useGuest } from '@/contexts/GuestContext';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
 
@@ -163,15 +164,7 @@ export default function ContentCalendar() {
   const plannedEvents = events.filter(e => e.status === 'planned').sort((a, b) => a.date.localeCompare(b.date));
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2"><Skeleton className="h-8 w-36" /><Skeleton className="h-4 w-52" /></div>
-          <Skeleton className="h-10 w-28" />
-        </div>
-        <Skeleton className="h-[420px] rounded-xl" />
-      </div>
-    );
+    return <PageSkeleton variant="calendar" />;
   }
 
   return (
