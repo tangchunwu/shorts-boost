@@ -297,4 +297,39 @@
     @apply animate-scale-in;
     animation-duration: 0.4s;
   }
+
+  /* ─── Auth page decorative orbs ────────────────────── */
+  .auth-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .auth-orb-1 {
+    width: 500px;
+    height: 500px;
+    background: linear-gradient(135deg, hsl(280 60% 70%), hsl(320 60% 70%));
+    top: -15%;
+    right: -10%;
+  }
+  .auth-orb-2 {
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, hsl(210 70% 65%), hsl(250 60% 70%));
+    bottom: -10%;
+    left: -5%;
+  }
+  .auth-orb-3 {
+    width: 250px;
+    height: 250px;
+    background: linear-gradient(135deg, hsl(340 60% 70%), hsl(20 80% 70%));
+    top: 50%;
+    left: 40%;
+    opacity: 0.2;
+  }
+
+  .dark .auth-orb {
+    opacity: 0.15;
+  }
 }
