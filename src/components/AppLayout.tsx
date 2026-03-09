@@ -17,6 +17,8 @@ const navItems = [
 
 export default function AppLayout() {
   const { user, signOut } = useAuth();
+  const { isGuest, exitGuestMode } = useGuest();
+  const navigate = useNavigate();
   const [dark, setDark] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') === 'dark';
