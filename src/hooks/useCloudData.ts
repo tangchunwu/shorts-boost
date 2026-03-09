@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useGuest } from '@/contexts/GuestContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { PublishRecord, AnalysisHistory, CalendarEvent, SEOSuggestion, Platform } from '@/lib/types';
 
@@ -7,9 +8,12 @@ import type { PublishRecord, AnalysisHistory, CalendarEvent, SEOSuggestion, Plat
 
 export function useRecords() {
   const { user } = useAuth();
+  const { isGuest, guestRecords } = useGuest();
+
   return useQuery({
-    queryKey: ['records', user?.id],
+    queryKey: ['records', isGuest ? 'guest' : user?.id],
     queryFn: async (): Promise<PublishRecord[]> => {
+      if (isGuest) return guestRecords;
       if (!user) return [];
       const { data, error } = await supabase
         .from('records')
@@ -31,15 +35,23 @@ export function useRecords() {
         createdAt: r.created_at,
       }));
     },
-    enabled: !!user,
+    enabled: !!user || isGuest,
   });
 }
 
 export function useSaveRecord() {
   const { user } = useAuth();
+  const { isGuest, guestRecords, setGuestRecords } = useGuest();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (r: PublishRecord) => {
+      if (isGuest) {
+        const all = [...guestRecords];
+        const idx = all.findIndex(x => x.id === r.id);
+        if (idx >= 0) all[idx] = r; else all.unshift(r);
+        setGuestRecords(all);
+        return;
+      }
       if (!user) throw new Error('Not authenticated');
       const { error } = await supabase.from('records').upsert({
         id: r.id,
@@ -61,9 +73,14 @@ export function useSaveRecord() {
 }
 
 export function useDeleteRecord() {
+  const { isGuest, guestRecords, setGuestRecords } = useGuest();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      if (isGuest) {
+        setGuestRecords(guestRecords.filter(r => r.id !== id));
+        return;
+      }
       const { error } = await supabase.from('records').delete().eq('id', id);
       if (error) throw error;
     },
@@ -75,9 +92,12 @@ export function useDeleteRecord() {
 
 export function useAnalyses() {
   const { user } = useAuth();
+  const { isGuest, guestAnalyses } = useGuest();
+
   return useQuery({
-    queryKey: ['analyses', user?.id],
+    queryKey: ['analyses', isGuest ? 'guest' : user?.id],
     queryFn: async (): Promise<AnalysisHistory[]> => {
+      if (isGuest) return guestAnalyses;
       if (!user) return [];
       const { data, error } = await supabase
         .from('analyses')
@@ -94,15 +114,20 @@ export function useAnalyses() {
         createdAt: a.created_at.slice(0, 10),
       }));
     },
-    enabled: !!user,
+    enabled: !!user || isGuest,
   });
 }
 
 export function useSaveAnalysis() {
   const { user } = useAuth();
+  const { isGuest, guestAnalyses, setGuestAnalyses } = useGuest();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (a: AnalysisHistory) => {
+      if (isGuest) {
+        setGuestAnalyses([a, ...guestAnalyses]);
+        return;
+      }
       if (!user) throw new Error('Not authenticated');
       const { error } = await supabase.from('analyses').insert({
         id: a.id,
@@ -122,9 +147,12 @@ export function useSaveAnalysis() {
 
 export function useCalendarEvents() {
   const { user } = useAuth();
+  const { isGuest, guestCalendar } = useGuest();
+
   return useQuery({
-    queryKey: ['calendar_events', user?.id],
+    queryKey: ['calendar_events', isGuest ? 'guest' : user?.id],
     queryFn: async (): Promise<CalendarEvent[]> => {
+      if (isGuest) return guestCalendar;
       if (!user) return [];
       const { data, error } = await supabase
         .from('calendar_events')
@@ -141,15 +169,23 @@ export function useCalendarEvents() {
         recordId: e.record_id || undefined,
       }));
     },
-    enabled: !!user,
+    enabled: !!user || isGuest,
   });
 }
 
 export function useSaveCalendarEvent() {
   const { user } = useAuth();
+  const { isGuest, guestCalendar, setGuestCalendar } = useGuest();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (e: CalendarEvent) => {
+      if (isGuest) {
+        const all = [...guestCalendar];
+        const idx = all.findIndex(x => x.id === e.id);
+        if (idx >= 0) all[idx] = e; else all.push(e);
+        setGuestCalendar(all);
+        return;
+      }
       if (!user) throw new Error('Not authenticated');
       const { error } = await supabase.from('calendar_events').upsert({
         id: e.id,
@@ -167,9 +203,14 @@ export function useSaveCalendarEvent() {
 }
 
 export function useDeleteCalendarEvent() {
+  const { isGuest, guestCalendar, setGuestCalendar } = useGuest();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      if (isGuest) {
+        setGuestCalendar(guestCalendar.filter(e => e.id !== id));
+        return;
+      }
       const { error } = await supabase.from('calendar_events').delete().eq('id', id);
       if (error) throw error;
     },

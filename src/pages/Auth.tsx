@@ -5,10 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, User } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logoImg from '@/assets/logo.png';
+import { useGuest } from '@/contexts/GuestContext';
 
 export default function Auth() {
   const [tab, setTab] = useState<'login' | 'signup'>('login');
@@ -16,6 +18,7 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const { enterGuestMode } = useGuest();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,6 +119,24 @@ export default function Auth() {
               </form>
             </TabsContent>
           </Tabs>
+
+          <div className="mt-4">
+            <div className="relative">
+              <Separator />
+              <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">或</span>
+            </div>
+            <Button
+              variant="outline"
+              className="w-full mt-4 gap-2 border-dashed"
+              onClick={enterGuestMode}
+            >
+              <Eye className="h-4 w-4" />
+              以访客身份体验
+            </Button>
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              使用示例数据浏览全部功能，操作不会被保存
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
