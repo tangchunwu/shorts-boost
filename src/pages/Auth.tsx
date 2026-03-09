@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Loader2, Mail, Lock, User, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -47,50 +46,45 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 dot-pattern opacity-40" />
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/8 rounded-full blur-3xl animate-pulse-soft" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-accent/8 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1.2s' }} />
-
-      <Card className="w-full max-w-md animate-fade-in relative z-10 shadow-lg border-border/60">
-        <CardHeader className="text-center pb-4">
-          <div className="mx-auto mb-3 w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10 shadow-inner">
-            <img src={logoImg} alt="短视频增长助手" className="w-10 h-10" />
+    <div className="min-h-screen flex items-center justify-center p-6 bg-background relative">
+      <Card className="w-full max-w-[420px] animate-fade-in zen-float">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto mb-4 w-[72px] h-[72px] rounded-[22px] flex items-center justify-center bg-input" style={{ boxShadow: 'var(--shadow-inset)' }}>
+            <img src={logoImg} alt="短视频增长助手" className="w-9 h-9" />
           </div>
-          <CardTitle className="text-2xl font-bold gradient-text">
+          <CardTitle className="text-2xl font-extrabold tracking-tight text-foreground">
             短视频增长助手
           </CardTitle>
-          <CardDescription className="text-muted-foreground">优化标题 · 提升流量 · 数据驱动</CardDescription>
+          <CardDescription className="zen-label mt-2">优化标题 · 提升流量 · 数据驱动</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-2">
           <Tabs value={tab} onValueChange={v => setTab(v as 'login' | 'signup')}>
-            <TabsList className="grid w-full grid-cols-2 rounded-xl bg-secondary/60">
-              <TabsTrigger value="login" className="rounded-lg">登录</TabsTrigger>
-              <TabsTrigger value="signup" className="rounded-lg">注册</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login">登录</TabsTrigger>
+              <TabsTrigger value="signup">注册</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4 mt-4">
+              <form onSubmit={handleLogin} className="space-y-4 mt-5">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">邮箱</Label>
+                  <Label htmlFor="login-email" className="zen-label">邮箱</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="login-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-9 rounded-xl" required />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                    <Input id="login-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-11" required />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">密码</Label>
+                  <Label htmlFor="login-password" className="zen-label">密码</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="login-password" type="password" placeholder="••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-9 rounded-xl" required />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                    <Input id="login-password" type="password" placeholder="••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-11" required />
                   </div>
                 </div>
-                <Button type="submit" disabled={loading} className="w-full rounded-xl btn-primary-glow text-primary-foreground">
+                <Button type="submit" disabled={loading} className="w-full">
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '登录'}
                 </Button>
                 <div className="text-center">
-                  <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                  <Link to="/forgot-password" className="text-[10px] text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest font-bold">
                     忘记密码？
                   </Link>
                 </div>
@@ -98,50 +92,54 @@ export default function Auth() {
             </TabsContent>
 
             <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4 mt-4">
+              <form onSubmit={handleSignup} className="space-y-4 mt-5">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-username">用户名</Label>
+                  <Label htmlFor="signup-username" className="zen-label">用户名</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="signup-username" placeholder="你的昵称" value={username} onChange={e => setUsername(e.target.value)} className="pl-9 rounded-xl" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                    <Input id="signup-username" placeholder="你的昵称" value={username} onChange={e => setUsername(e.target.value)} className="pl-11" />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">邮箱</Label>
+                  <Label htmlFor="signup-email" className="zen-label">邮箱</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="signup-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-9 rounded-xl" required />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                    <Input id="signup-email" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-11" required />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">密码</Label>
+                  <Label htmlFor="signup-password" className="zen-label">密码</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="signup-password" type="password" placeholder="至少 6 个字符" value={password} onChange={e => setPassword(e.target.value)} className="pl-9 rounded-xl" required minLength={6} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                    <Input id="signup-password" type="password" placeholder="至少 6 个字符" value={password} onChange={e => setPassword(e.target.value)} className="pl-11" required minLength={6} />
                   </div>
                 </div>
-                <Button type="submit" disabled={loading} className="w-full rounded-xl btn-primary-glow text-primary-foreground">
+                <Button type="submit" disabled={loading} className="w-full">
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : '注册'}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
 
-          <div className="mt-5">
+          <div className="mt-6">
             <div className="relative">
-              <Separator className="bg-border/60" />
-              <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs text-muted-foreground">或</span>
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-card px-3 zen-label">或</span>
+              </div>
             </div>
             <Button
               variant="outline"
-              className="w-full mt-4 gap-2 border-dashed rounded-xl hover:bg-secondary/60 transition-all"
+              className="w-full mt-5 gap-2"
               onClick={enterGuestMode}
             >
-              <Eye className="h-4 w-4" />
+              <Eye className="h-4 w-4" strokeWidth={1.5} />
               以访客身份体验
             </Button>
-            <p className="text-center text-xs text-muted-foreground mt-2">
-              使用示例数据浏览全部功能，操作不会被保存
+            <p className="text-center zen-label mt-3">
+              使用示例数据浏览全部功能
             </p>
           </div>
         </CardContent>
