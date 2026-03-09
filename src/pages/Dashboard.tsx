@@ -138,15 +138,15 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 page-enter">
         <div className="space-y-2">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-64" />
+          <div className="skeleton-shimmer h-8 w-48" />
+          <div className="skeleton-shimmer h-4 w-64" />
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[1,2,3,4].map(i => <Skeleton key={i} className="h-24 rounded-xl" />)}
+          {[1,2,3,4].map(i => <div key={i} className="skeleton-shimmer h-24 rounded-[28px]" />)}
         </div>
-        <Skeleton className="h-48 rounded-xl" />
+        <div className="skeleton-shimmer h-48 rounded-[28px]" />
       </div>
     );
   }
