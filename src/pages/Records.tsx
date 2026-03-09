@@ -177,12 +177,12 @@ export default function Records() {
 
   return (
     <div className="space-y-6 page-enter">
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         <div>
           <h1 className="text-2xl font-bold">发布记录</h1>
           <p className="text-muted-foreground text-sm mt-1">记录和复盘短视频表现</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1"><Upload className="h-3.5 w-3.5" /> 导入 CSV</Button>
           <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleImportCSV} />
           {records.length > 0 && (
