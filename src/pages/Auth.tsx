@@ -55,8 +55,8 @@ export default function Auth() {
       <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] relative z-10 flex-col items-center justify-center p-12">
         <div className="max-w-md space-y-10 animate-fade-in">
           {/* Big logo */}
-          <div className="w-28 h-28 rounded-[32px] flex items-center justify-center bg-card" style={{ boxShadow: 'var(--shadow-float)' }}>
-            <img src={logoImg} alt="短视频增长助手" className="w-16 h-16" />
+          <div className="w-40 h-40 rounded-[40px] flex items-center justify-center bg-card" style={{ boxShadow: 'var(--shadow-float)' }}>
+            <img src={logoImg} alt="短视频增长助手" className="w-28 h-28" />
           </div>
 
           <div className="space-y-4">
@@ -94,8 +94,8 @@ export default function Auth() {
         <div className="w-full max-w-[420px] animate-fade-in">
           {/* Mobile logo */}
           <div className="lg:hidden flex flex-col items-center mb-8">
-            <div className="w-20 h-20 rounded-[24px] flex items-center justify-center bg-card mb-4" style={{ boxShadow: 'var(--shadow-float)' }}>
-              <img src={logoImg} alt="短视频增长助手" className="w-11 h-11" />
+            <div className="w-28 h-28 rounded-[28px] flex items-center justify-center bg-card mb-4" style={{ boxShadow: 'var(--shadow-float)' }}>
+              <img src={logoImg} alt="短视频增长助手" className="w-16 h-16" />
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
               短视频增长助手
