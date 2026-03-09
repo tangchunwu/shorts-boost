@@ -5,6 +5,8 @@ import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, Activity, RefreshCw } f
 import { supabase } from '@/integrations/supabase/client';
 import type { PublishRecord } from '@/lib/types';
 import { toast } from 'sonner';
+import { useGuest } from '@/contexts/GuestContext';
+import GuestPromptDialog from '@/components/GuestPromptDialog';
 
 export interface Insight {
   type: 'trend' | 'anomaly' | 'tip' | 'warning';
@@ -29,8 +31,11 @@ export default function AIInsightsCard({ records, onInsightsChange }: Props) {
   const [rawContent, setRawContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const { isGuest } = useGuest();
+  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
 
   const fetchInsights = async () => {
+    if (isGuest) { setShowGuestPrompt(true); return; }
     if (records.length === 0) {
       toast.error('暂无发布记录，无法分析');
       return;
@@ -137,6 +142,7 @@ export default function AIInsightsCard({ records, onInsightsChange }: Props) {
           </div>
         )}
       </CardContent>
+      <GuestPromptDialog open={showGuestPrompt} onOpenChange={setShowGuestPrompt} featureName="AI 洞察" />
     </Card>
   );
 }
