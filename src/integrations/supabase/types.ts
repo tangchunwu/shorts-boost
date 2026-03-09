@@ -196,6 +196,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_goals: {
+        Row: {
+          created_at: string
+          engagement_target: number
+          id: string
+          month: string
+          updated_at: string
+          user_id: string
+          views_target: number
+        }
+        Insert: {
+          created_at?: string
+          engagement_target?: number
+          id?: string
+          month: string
+          updated_at?: string
+          user_id: string
+          views_target?: number
+        }
+        Update: {
+          created_at?: string
+          engagement_target?: number
+          id?: string
+          month?: string
+          updated_at?: string
+          user_id?: string
+          views_target?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
