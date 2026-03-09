@@ -13,6 +13,7 @@ import { useRecords, useSaveRecord, useDeleteRecord } from '@/hooks/useCloudData
 import { exportToCSV, parseCSV } from '@/lib/csv';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Trash2, Eye, ThumbsUp, MessageSquare, Share2, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy, AlertTriangle, Lightbulb, Star, Download, Upload, FileText, Search, ArrowUpDown } from 'lucide-react';
+import AIProgressBar from '@/components/AIProgressBar';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell } from 'recharts';
 import ChartTooltip from '@/components/ChartTooltip';
@@ -253,6 +254,8 @@ export default function Records() {
           {searchQuery && <span className="text-xs text-muted-foreground">找到 {filteredRecords.length} 条结果</span>}
         </div>
       )}
+
+      <AIProgressBar active={reviewing} steps={['正在提交数据...', '分析视频表现模式...', '总结成功规律...', '生成复盘建议...']} />
 
       {reviewResult && (
         <div className="space-y-4 animate-fade-in-up">

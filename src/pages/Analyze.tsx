@@ -14,6 +14,7 @@ import { Platform, PLATFORM_LABELS, SEOSuggestion, AnalysisHistory, CalendarEven
 import { useAnalyses, useSaveAnalysis, useSaveCalendarEvent } from '@/hooks/useCloudData';
 import { supabase } from '@/integrations/supabase/client';
 import { Copy, Check, Loader2, Sparkles, Clock, Hash, Lightbulb, History, Eye, ChevronDown, ChevronUp, Search, CalendarPlus, Wand2, Plus, Trash2, Share, BarChart3, Image } from 'lucide-react';
+import AIProgressBar from '@/components/AIProgressBar';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -394,8 +395,10 @@ export default function Analyze() {
                     </Button>
                     {result && <ShareCardButton result={result} title={title} platform={platform} />}
                   </div>
+                  <AIProgressBar active={loading} steps={['正在连接 AI 服务...', '分析标题质量...', '生成关键词推荐...', '优化建议生成中...']} />
                 </>
               )}
+              {batchMode && <AIProgressBar active={batchLoading} steps={['正在批量提交...', '逐个分析标题...', '对比评分中...', '汇总结果...']} />}
             </CardContent>
           </Card>
 

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Platform, PLATFORM_LABELS } from '@/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { Flame, Loader2, TrendingUp, TrendingDown, Minus, ArrowRight, Lightbulb, Copy, Check } from 'lucide-react';
+import AIProgressBar from '@/components/AIProgressBar';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import GuestPromptDialog from '@/components/GuestPromptDialog';
@@ -135,6 +136,7 @@ export default function TrendingTopics() {
               {loading ? '分析中...' : '获取热门话题'}
             </Button>
           </div>
+          <AIProgressBar active={loading} steps={['正在连接 AI 服务...', '扫描平台热门内容...', '分析话题趋势...', '生成推荐...']} />
         </CardContent>
       </Card>
 
