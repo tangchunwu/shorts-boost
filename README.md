@@ -9,6 +9,16 @@
 
 ---
 
+## 📸 应用截图
+
+### 仪表盘 — 数据概览与目标追踪
+![仪表盘截图](public/screenshots/dashboard.png)
+
+### SEO 分析 — AI 智能标题优化
+![SEO 分析截图](public/screenshots/analyze.png)
+
+---
+
 ## ✨ 核心功能
 
 ### 🎯 SEO 智能分析
