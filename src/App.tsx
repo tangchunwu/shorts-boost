@@ -57,6 +57,7 @@ const AppRoutes = () => (
       <Route path="/calendar" element={<ContentCalendar />} />
       <Route path="/trending" element={<TrendingTopics />} />
       <Route path="/competitors" element={<CompetitorMonitor />} />
+      <Route path="/projects" element={<Projects />} />
     </Route>
     <Route path="*" element={<NotFound />} />
   </Routes>
