@@ -151,6 +151,51 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          created_at: string
+          description: string | null
+          github_url: string | null
+          id: string
+          image_url: string | null
+          name: string
+          npm_url: string | null
+          tags: string[] | null
+          updated_at: string
+          url: string | null
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          github_url?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          npm_url?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          url?: string | null
+          user_id: string
+          year?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          github_url?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          npm_url?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       records: {
         Row: {
           comments: number
