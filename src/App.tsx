@@ -12,6 +12,7 @@ import Records from "./pages/Records";
 import ContentCalendar from "./pages/ContentCalendar";
 import TrendingTopics from "./pages/TrendingTopics";
 import CompetitorMonitor from "./pages/CompetitorMonitor";
+import Projects from "./pages/Projects";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -56,6 +57,7 @@ const AppRoutes = () => (
       <Route path="/calendar" element={<ContentCalendar />} />
       <Route path="/trending" element={<TrendingTopics />} />
       <Route path="/competitors" element={<CompetitorMonitor />} />
+      <Route path="/projects" element={<Projects />} />
     </Route>
     <Route path="*" element={<NotFound />} />
   </Routes>

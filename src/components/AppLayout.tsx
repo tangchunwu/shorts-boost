@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import AnimatedOutlet from '@/components/AnimatedOutlet';
 import GlobalSearch from '@/components/GlobalSearch';
-import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut, Eye, X, Flame, Users } from 'lucide-react';
+import { BarChart3, Search, FileText, Calendar, Sun, Moon, Download, Upload, LogOut, Eye, X, Flame, Users, FolderOpen } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -17,6 +17,7 @@ const navItems = [
   { to: '/records', icon: FileText, label: '发布记录', tourId: 'tour-nav-records' },
   { to: '/calendar', icon: Calendar, label: '内容日历', tourId: 'tour-nav-calendar' },
   { to: '/competitors', icon: Users, label: '竞品监控', tourId: 'tour-nav-competitors' },
+  { to: '/projects', icon: FolderOpen, label: '项目展示', tourId: 'tour-nav-projects' },
 ];
 
 export default function AppLayout() {
